@@ -1,5 +1,14 @@
+import { config } from "./config";
 const acorn = require("acorn");
 const fs = require('node:fs/promises');
+
+function main(){
+    if(config.useGitIgnore == true){
+        console.log("OK")
+    }
+}
+
+main();
 
 async function readProject(directory: string){
     let dirContents = await fs.readdir(directory);
@@ -19,4 +28,5 @@ async function readProject(directory: string){
     
     console.log(dirContents);
 }
-readProject(".") //the src directory
+// readProject(".") //the src directory
+readProject("./testProjects/yt-anti-translate")

@@ -1,6 +1,9 @@
 {
     "compilerOptions": {
-        "module": "CommonJS",
-        "types": ["node"]
-    }
+        "module": "nodenext",
+        "types": ["node"],
+        "outDir": "out",
+        "sourceMap": true,
+    },
+    "exclude": ["**/node_modules", "**/testProjects/**"],
 }

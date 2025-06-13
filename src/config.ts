@@ -7,6 +7,7 @@ export let config = {
         ".git",
         ".github",
         "eslint.config.js",
-        "playwright.config.ts"
+        "playwright.config.ts",
+        "tests/**",
     ]
 }

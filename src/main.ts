@@ -1,10 +1,12 @@
 import { config } from "./config";
 import { glob } from 'glob';
-const acorn = require("acorn");
-const fs = require('node:fs/promises');
+import * as acorn from "acorn";
+import * as walk from "acorn-walk";
+import * as fs from 'node:fs/promises';
 
-let acornOptions = {
-    ecmaVersion: "2020",
+let acornOptions: acorn.Options = {
+    ecmaVersion: 2020,
+    locations: true,
 }
 
 async function main(){

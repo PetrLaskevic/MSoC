@@ -1,9 +1,10 @@
+import {Options} from "acorn";
 //The configuration for the project you're analyzing
 interface Config {
     useGitIgnore?: boolean,
     otherIgnores?: string[],
     //default if not specified 2020
-    ecmaScriptVersion?: "latest" | string //2020 etc
+    ecmaScriptVersion?: Options["ecmaVersion"] //"latest" or number 2020 etc
 }
 
 export let config: Config = {

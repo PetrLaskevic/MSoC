@@ -3,6 +3,10 @@ import { glob } from 'glob';
 const acorn = require("acorn");
 const fs = require('node:fs/promises');
 
+let acornOptions = {
+    ecmaVersion: "2020",
+}
+
 async function main(){
     let ignores: string[] = [];
     if(config.useGitIgnore == true){
@@ -14,6 +18,11 @@ async function main(){
         );
         console.log(config.otherIgnores);
         ignores.push(...config.otherIgnores);
+    }
+    if(config.ecmaScriptVersion){
+        acornOptions.ecmaVersion = config.ecmaScriptVersion;
+    }else{
+        console.warn("ES version not specified, defaulting to 2020");
     }
     readGlobbed("src/testProjects/yt-anti-translate", ignores);
 }

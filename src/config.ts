@@ -2,6 +2,8 @@
 interface Config {
     useGitIgnore?: boolean,
     otherIgnores?: string[],
+    //default if not specified 2020
+    ecmaScriptVersion?: "latest" | string //2020 etc
 }
 
 export let config: Config = {

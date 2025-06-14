@@ -41,33 +41,52 @@ async function loadGitIgnore(directory: string) : Promise<string[]> {
 
 }
 
-function getFunctionCallName(callExpressionNode: acorn.CallExpression) : string {
-    let parentNode = callExpressionNode.callee;
-    let wholeName: string[] = [];
-    //leaf of the CallExpression => (sometimes MemberExpression when a.b.c() ) => Identifier chain
-    let leafIdentifierName = ""; 
-    while(parentNode.type != "Identifier"){
-        if(parentNode.type == "MemberExpression"){
-            //for static a.b.c() type of situations
-            //doesn't support a[b].c() yet
-            if(parentNode.property.type == "Identifier"){
-                wholeName.push(parentNode.property.name);
-            }
-            //to continue loop, .object holds the parent, 
-            // so in "a.b.c" it eventually leads us to "a", where parentNode.name will get it
-            parentNode = parentNode.object;
+function getSubStringAcrossLines(loc: acorn.SourceLocation, code: string[]) : string {
+    //1 indexed lines, 0 indexed columns
+    let start = loc.start; //start: Position { line: 3, column: 0 }, //column included
+    let end = loc.end; //end: Position { line: 3, column: 18 } //column not included
+    if(start.line == end.line){
+        return code[start.line-1].slice(start.column, end.column);
+    }
+    let lines = code.slice(start.line, end.line + 1);
+    lines[0] = lines[0].slice(start.column, lines[0].length);
+    lines[lines.length - 1] = lines[lines.length - 1].slice(0, end.column);
+    return lines.join("");
+}
+interface FunctionCallInfo{
+    /*Example
+
+    let a = {
+        setLogLevel: function (levelName) {
+            //content
         }
     }
-    // the whole name for `callbackify()` when chain is CallExpression.callee => Identifier.name => callbackify
-    // the first part (chrome) when the structure is:
-    //  chrome.storage.sync.get
-    //  CallExpression.callee => MemberExpression .object => MemberExpression .object => MemberExpression .object => Identifier
-    //                             .property: "get"           .property: "sync"           .property: "storage"          .name: "chrome"
-    //  => that's the reason for the while loop above
-    leafIdentifierName = parentNode.name;
-    wholeName.push(leafIdentifierName);
-    wholeName.reverse();
-    return wholeName.join(".");
+    
+    callName: setLogLevel
+    callLocation: 
+    parentExpressionLocation: 
+    */
+    callName: string, //no parameters for now
+    //line(s) and column where callName is, to show appropriate source
+    callLocation: acorn.SourceLocation,
+    //the whole expression the Line is part of (ExpressionStatement)
+    parentExpressionLocation: acorn.SourceLocation
+    //maybe for clarity in future include the closest related parent "container"
+    //i.e ArrayExpression, ObjectExpression etc
+    //(objects can be very large, sometimes closest parent is all what is needed for context)
+}
+function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors: acorn.Node[], code: string[]) : FunctionCallInfo {
+    //return function call name, the LINE(s) of the CallExpression , and 
+    let functionName = getSubStringAcrossLines(callExpressionNode.loc, code);
+    //Afaik, there should be only one, they can't be nested
+    //ancestors are in descending direction, from the tree root "Program" to our "CallExpression"
+    //(so if this was too slow, we can optimize constants a bit by traversing backwards)
+    let parentExpression = ancestors.filter((item) => ["ExpressionStatement", "VariableDeclaration"].includes(item.type))[0];
+    return {
+        callName: functionName,
+        callLocation: callExpressionNode.loc,
+        parentExpressionLocation: parentExpression.loc
+    }
 }
 function listOfFunctions(jsCode: string) : string[] {
     let functions : string[] = [];
@@ -83,32 +102,24 @@ function listOfFunctions(jsCode: string) : string[] {
     // });
     // console.log(tokens);
 
-    walk.simple(acorn.parse(jsCode, acornOptions), {
-        ArrowFunctionExpression(node) {
-            // console.log(`Found an arrow function:`);
-            // console.dir(node, { depth: null });
-        },
-        FunctionExpression(node){
-            // console.log(`Found a function:`)
-            // console.dir(node, { depth: null });
-        },
-        ExpressionStatement(node){
-            // console.log(`Found an expression statement:`);
-            // console.dir(node, { depth: null });
-        },
-        CallExpression(node){
-            console.log(getFunctionCallName(node));
-            //detecting chrome.storage.sync.get
-            
+    let code =  ["let b=array.index.b.c('param');chrome.storage.sync.get();array[satisfies(index)].b();{array[index.s].b()}"]; //let a = [foo('hi'), bar()];   // "arr = foo('hi')"
+    let p = acorn.parse(code[0], acornOptions)
+    walk.ancestor(p, {
+        CallExpression(_node, _state, ancestors) {
+            console.log(getFunctionCallName(_node, ancestors, code));
+            // console.log("This call expr ancestors are:", ancestors.map(n => n.type))
         }
     });
 
-    // console.log("all nodes\n\n\n");
+    console.log("all nodes\n\n\n");
+    // console.dir(p.body, { depth: null })
     // console.dir(acorn.parse(jsCode, acornOptions).body, { depth: null })
 
     return functions;
 }
 
+
+listOfFunctions("");
 // async function readGlobbed(directory: string, ignores: string[]){
 //     console.log(directory, ignores)
 //     //TODO: test how well acorn supports .ts files (if no, tell the user to compile ts files in js first)
@@ -127,9 +138,12 @@ function listOfFunctions(jsCode: string) : string[] {
 // src/testProjects/yt-anti-translate/app/src/global.js
 // src/testProjects/yt-anti-translate/app/src/content_start.js
 // src/testProjects/yt-anti-translate/app/src/content_injectglobal.js
-async function test(){
-    let fileContent = await fs.readFile("src/testProjects/yt-anti-translate/app/src/content_start.js", 'utf8');
-    listOfFunctions(fileContent);
-}
 
-test();
+// let code: string[] = [];
+// async function test(){
+//     let fileContent = await fs.readFile("src/testProjects/yt-anti-translate/app/src/content_start.js", 'utf8');
+//     // code = fileContent.split("\n");
+//     // listOfFunctions(fileContent);
+// }
+
+// test();

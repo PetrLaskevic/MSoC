@@ -81,8 +81,19 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
     let functionName = getSubStringAcrossLines(callExpressionNode.loc, code);
     //Afaik, there should be only one, they can't be nested
     //ancestors are in descending direction, from the tree root "Program" to our "CallExpression"
-    //(so if this was too slow, we can optimize constants a bit by traversing backwards)
-    let parentExpression = ancestors.filter((item) => ["ExpressionStatement", "VariableDeclaration"].includes(item.type))[0];
+    //traversing backwards, since for example for loops can be nested (we want to return the closest ancestor)
+    let parentExpression;
+    
+    for(let x = ancestors.length - 1; x >= 0; x--){
+        let item = ancestors[x];
+        if(["ExpressionStatement", "VariableDeclaration", "LogicalExpression", "ForOfStatement"].includes(item.type)){
+            parentExpression = item;
+        }
+    }
+
+    if(parentExpression == undefined){
+        throw Error("To ne");
+    }
     return {
         callName: functionName,
         callLocation: callExpressionNode.loc,
@@ -109,8 +120,11 @@ function listOfFunctions(jsCode: string) : string[] {
         CallExpression(_node, _state, ancestors) {
             let callInfo = getFunctionCallName(_node, ancestors, jsCodeLines);
             functions.push(callInfo.callName);
-            // console.log("This call expr ancestors are:", ancestors.map(n => n.type))
-        }
+            console.log("This call expr ancestors are:", ancestors.map(n => n.type))
+        },
+        // FunctionDeclaration(_node, _state, ancestors) {
+        //     console.log("got functionDeclaration")
+        // }
     });
 
     console.log("all nodes\n\n\n");
@@ -137,12 +151,13 @@ function listOfFunctions(jsCode: string) : string[] {
 
 // src/testProjects/yt-anti-translate/app/src/permission.js
 // src/testProjects/yt-anti-translate/app/src/global.js
-// src/testProjects/yt-anti-translate/app/src/content_start.js
-// src/testProjects/yt-anti-translate/app/src/content_injectglobal.js
+// src/testProjects/yt-anti-translate/app/src/content_start.js //ok
+// src/testProjects/yt-anti-translate/app/src/content_injectglobal.js //ok
 
 
 async function test(){
-    let fileContent = await fs.readFile("src/testProjects/yt-anti-translate/app/src/content_start.js", 'utf8');
+    let fileContent = await fs.readFile("src/testProjects/yt-anti-translate/app/src/background_audio.js", 'utf8');
+    // listOfFunctions(fileContent);
     console.log(listOfFunctions(fileContent));
 }
 

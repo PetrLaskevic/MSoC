@@ -48,9 +48,10 @@ function getSubStringAcrossLines(loc: acorn.SourceLocation, code: string[]) : st
     if(start.line == end.line){
         return code[start.line-1].slice(start.column, end.column);
     }
-    let lines = code.slice(start.line, end.line + 1);
+    let lines = code.slice(start.line-1, end.line); //1 indexed
     lines[0] = lines[0].slice(start.column, lines[0].length);
     lines[lines.length - 1] = lines[lines.length - 1].slice(0, end.column);
+    lines = lines.map(line => line.trim());
     return lines.join("");
 }
 interface FunctionCallInfo{
@@ -89,6 +90,7 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
     }
 }
 function listOfFunctions(jsCode: string) : string[] {
+    let jsCodeLines = jsCode.split("\n");
     let functions : string[] = [];
     //while I could loop over the token list an get the top level function declarations, I'm not going to get any functions defined in a function
     // const tokens: Node[] = acorn.parse(jsCode, acornOptions).body;
@@ -102,11 +104,11 @@ function listOfFunctions(jsCode: string) : string[] {
     // });
     // console.log(tokens);
 
-    let code =  ["let b=array.index.b.c('param');chrome.storage.sync.get();array[satisfies(index)].b();{array[index.s].b()}"]; //let a = [foo('hi'), bar()];   // "arr = foo('hi')"
-    let p = acorn.parse(code[0], acornOptions)
+    let p = acorn.parse(jsCode, acornOptions)
     walk.ancestor(p, {
         CallExpression(_node, _state, ancestors) {
-            console.log(getFunctionCallName(_node, ancestors, code));
+            let callInfo = getFunctionCallName(_node, ancestors, jsCodeLines);
+            functions.push(callInfo.callName);
             // console.log("This call expr ancestors are:", ancestors.map(n => n.type))
         }
     });
@@ -119,7 +121,6 @@ function listOfFunctions(jsCode: string) : string[] {
 }
 
 
-listOfFunctions("");
 // async function readGlobbed(directory: string, ignores: string[]){
 //     console.log(directory, ignores)
 //     //TODO: test how well acorn supports .ts files (if no, tell the user to compile ts files in js first)
@@ -139,11 +140,10 @@ listOfFunctions("");
 // src/testProjects/yt-anti-translate/app/src/content_start.js
 // src/testProjects/yt-anti-translate/app/src/content_injectglobal.js
 
-// let code: string[] = [];
-// async function test(){
-//     let fileContent = await fs.readFile("src/testProjects/yt-anti-translate/app/src/content_start.js", 'utf8');
-//     // code = fileContent.split("\n");
-//     // listOfFunctions(fileContent);
-// }
 
-// test();
+async function test(){
+    let fileContent = await fs.readFile("src/testProjects/yt-anti-translate/app/src/content_start.js", 'utf8');
+    console.log(listOfFunctions(fileContent));
+}
+
+test();

@@ -90,8 +90,8 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
     let foundFunction = false;
     //It seems like the only way to find out where from a call has been made is to go up the ancestor list and report all function declarations on the way
     for(let x = ancestors.length - 1; x >= 0; x--){
-        let item = ancestors[x];
-        if(["ExpressionStatement", "VariableDeclaration", "LogicalExpression", "ForOfStatement"].includes(item.type)){
+        let item = ancestors[x];                          //i.e. inside if                       //if(foo())
+        if(["ExpressionStatement", "VariableDeclaration", "LogicalExpression", "ForOfStatement", "IfStatement", "ReturnStatement"].includes(item.type)){
             parentExpression = item;
         }
         if(item.type == "FunctionDeclaration"){

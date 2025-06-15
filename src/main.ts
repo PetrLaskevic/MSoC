@@ -25,7 +25,7 @@ async function main(){
     }else{
         console.warn("ES version not specified, defaulting to 2020");
     }
-    // readGlobbed("src/testProjects/yt-anti-translate", ignores);
+    readGlobbed("src/testProjects/yt-anti-translate", ignores);
 }
 
 main();
@@ -134,14 +134,14 @@ function listOfFunctions(jsCode: string) : string[] {
         CallExpression(_node, _state, ancestors) {
             let callInfo = getFunctionCallName(_node, ancestors, jsCodeLines);
             functions.push(callInfo.callName + " from " + callInfo.calledInFunctions);
-            console.log("This call expr ancestors are:", ancestors.map(n => n.type))
+            // console.log("This call expr ancestors are:", ancestors.map(n => n.type))
         },
         // FunctionDeclaration(_node, _state, ancestors) {
         //     console.log("got functionDeclaration")
         // }
     });
 
-    console.log("all nodes\n\n\n");
+    // console.log("all nodes\n\n\n");
     // console.dir(p.body, { depth: null })
     // console.dir(acorn.parse(jsCode, acornOptions).body, { depth: null })
 
@@ -149,19 +149,21 @@ function listOfFunctions(jsCode: string) : string[] {
 }
 
 
-// async function readGlobbed(directory: string, ignores: string[]){
-//     console.log(directory, ignores)
-//     //TODO: test how well acorn supports .ts files (if no, tell the user to compile ts files in js first)
-//     const jsfiles = await glob([`${directory}/**/*.js`, `${directory}/**/*.ts`], { ignore: ignores });
-//     console.log("*********************")
-//     for(const filePath of jsfiles){
-//         let fileContent = await fs.readFile(filePath, 'utf8');
-//         let functions = listOfFunctions(fileContent);
-//         if(functions.length == 0){
-//             console.log(filePath);
-//         }
-//     }
-// }
+async function readGlobbed(directory: string, ignores: string[]){
+    console.log(directory, ignores)
+    //TODO: test how well acorn supports .ts files (if no, tell the user to compile ts files in js first)
+    const jsfiles = await glob([`${directory}/**/*.js`, `${directory}/**/*.ts`], { ignore: ignores });
+    console.log("*********************")
+    for(const filePath of jsfiles){
+        let fileContent = await fs.readFile(filePath, 'utf8');
+        let functions = listOfFunctions(fileContent);
+        if(functions.length == 0){
+            console.log(filePath);
+            break;
+        }
+        console.log(functions);
+    }
+}
 
 // src/testProjects/yt-anti-translate/app/src/permission.js
 // src/testProjects/yt-anti-translate/app/src/global.js
@@ -169,10 +171,10 @@ function listOfFunctions(jsCode: string) : string[] {
 // src/testProjects/yt-anti-translate/app/src/content_injectglobal.js //ok
 
 
-async function test(){
-    let fileContent = await fs.readFile("src/testProjects/yt-anti-translate/app/src/background_audio.js", 'utf8');
-    // listOfFunctions(fileContent);
-    console.log(listOfFunctions(fileContent));
-}
+// async function test(){
+//     let fileContent = await fs.readFile("src/testProjects/yt-anti-translate/app/src/background_audio.js", 'utf8');
+//     // listOfFunctions(fileContent);
+//     console.log(listOfFunctions(fileContent));
+// }
 
-test();
+// test();

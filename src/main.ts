@@ -75,6 +75,8 @@ interface FunctionCallInfo{
     //maybe for clarity in future include the closest related parent "container"
     //i.e ArrayExpression, ObjectExpression etc
     //(objects can be very large, sometimes closest parent is all what is needed for context)
+
+    calledInFunctions: string[]
 }
 function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors: acorn.Node[], code: string[]) : FunctionCallInfo {
     //return function call name, the LINE(s) of the CallExpression , and 
@@ -83,12 +85,23 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
     //ancestors are in descending direction, from the tree root "Program" to our "CallExpression"
     //traversing backwards, since for example for loops can be nested (we want to return the closest ancestor)
     let parentExpression;
-    
+    let calledFrom : string[] = [];
+
+    let foundFunction = false;
+    //It seems like the only way to find out where from a call has been made is to go up the ancestor list and report all function declarations on the way
     for(let x = ancestors.length - 1; x >= 0; x--){
         let item = ancestors[x];
         if(["ExpressionStatement", "VariableDeclaration", "LogicalExpression", "ForOfStatement"].includes(item.type)){
             parentExpression = item;
         }
+        if(item.type == "FunctionDeclaration"){
+            calledFrom.push((item as acorn.FunctionDeclaration).id.name);
+            foundFunction = true;
+        }
+    }
+
+    if(!foundFunction){
+        calledFrom.push("top level")
     }
 
     if(parentExpression == undefined){
@@ -97,7 +110,8 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
     return {
         callName: functionName,
         callLocation: callExpressionNode.loc,
-        parentExpressionLocation: parentExpression.loc
+        parentExpressionLocation: parentExpression.loc,
+        calledInFunctions: calledFrom
     }
 }
 function listOfFunctions(jsCode: string) : string[] {
@@ -119,7 +133,7 @@ function listOfFunctions(jsCode: string) : string[] {
     walk.ancestor(p, {
         CallExpression(_node, _state, ancestors) {
             let callInfo = getFunctionCallName(_node, ancestors, jsCodeLines);
-            functions.push(callInfo.callName);
+            functions.push(callInfo.callName + " from " + callInfo.calledInFunctions);
             console.log("This call expr ancestors are:", ancestors.map(n => n.type))
         },
         // FunctionDeclaration(_node, _state, ancestors) {

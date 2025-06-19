@@ -12,11 +12,11 @@ let acornOptions: acorn.Options = {
 async function main(){
     let ignores: string[] = [];
     if(config.useGitIgnore == true){
-        ignores.push(... await loadGitIgnore("src/testProjects/yt-anti-translate"));
+        ignores.push(... await loadGitIgnore(config.analysisTargetDir));
     }
     if(config.otherIgnores){
         config.otherIgnores = config.otherIgnores.map(
-            item => `src/testProjects/yt-anti-translate/${item}`
+            item => `${config.analysisTargetDir}/${item}`
         );
         ignores.push(...config.otherIgnores);
     }
@@ -25,7 +25,7 @@ async function main(){
     }else{
         console.warn("ES version not specified, defaulting to 2020");
     }
-    readGlobbed("src/testProjects/yt-anti-translate", ignores);
+    readGlobbed(config.analysisTargetDir, ignores);
 }
 
 main();
@@ -38,7 +38,6 @@ async function loadGitIgnore(directory: string) : Promise<string[]> {
     } catch (error) {
         throw Error(`No .gitignore in ${directory} detected, but config.useGitIgnore == true`);
     }
-
 }
 
 function getSubStringAcrossLines(loc: acorn.SourceLocation, code: string[]) : string {

@@ -1,6 +1,6 @@
 # To run:
 1. `npm ci` or `npm install`
-2. `npx ts-node main.ts`
+2. `npx ts-node src/main.ts`
 
 # Node version 20 or newer is required
 For the `glob` package.

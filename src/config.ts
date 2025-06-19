@@ -6,6 +6,7 @@ interface Config {
     //exclude .gitignore entries from analysis?
     useGitIgnore?: boolean,
     //What the authors wanted to have in git, but what we want to exclude from analysis
+    //evaluated with analysisTargetDir as base directory
     otherIgnores?: string[],
     //default if not specified 2020
     ecmaScriptVersion?: Options["ecmaVersion"] //"latest" or number 2020 etc
@@ -19,7 +20,9 @@ export let config: Config = {
         ".git",
         ".github",
         "eslint.config.js",
-        "playwright.config.ts",
-        "tests/**",
+        //both playwright links work, the wildcards are not needed, the ignores are evaluated with analysisTargetDir as base directory
+        "**/playwright.config.ts",
+        "playwright.config.js",
+        "tests/**", 
     ]
 }

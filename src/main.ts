@@ -41,6 +41,12 @@ async function loadGitIgnore(directory: string) : Promise<string[]> {
 }
 
 function getSubStringAcrossLines(loc: acorn.SourceLocation, code: string[]) : string {
+    if(!code){
+        throw Error("Argument code must be provided!");
+    }
+    if(!loc){
+        throw Error("acorn.SourceLocation with the code must be provided!");
+    }
     //1 indexed lines, 0 indexed columns
     let start = loc.start; //start: Position { line: 3, column: 0 }, //column included
     let end = loc.end; //end: Position { line: 3, column: 18 } //column not included
@@ -66,7 +72,8 @@ interface FunctionCallInfo{
     callLocation: 
     parentExpressionLocation: 
     */
-    callName: string, //no parameters for now
+    shortCallName: string //no parameters 
+    callName: string, //with parameters
     //line(s) and column where callName is, to show appropriate source
     callLocation: acorn.SourceLocation,
     //the whole expression the Line is part of (ExpressionStatement)
@@ -77,7 +84,7 @@ interface FunctionCallInfo{
 
     calledInFunctions: string[]
 }
-function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors: acorn.Node[], code: string[]) : FunctionCallInfo {
+function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors: acorn.Node[], code: string[], filePath: string) : FunctionCallInfo {
     //return function call name, the LINE(s) of the CallExpression , and 
     let functionName = getSubStringAcrossLines(callExpressionNode.loc, code);
     //Afaik, there should be only one, they can't be nested
@@ -107,13 +114,14 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
         throw Error("To ne");
     }
     return {
+        shortCallName: functionName.split("(")[0],
         callName: functionName,
         callLocation: callExpressionNode.loc,
         parentExpressionLocation: parentExpression.loc,
         calledInFunctions: calledFrom
     }
 }
-function listOfFunctions(jsCode: string) : string[] {
+function listOfFunctions(jsCode: string, filePath: string) : string[] {
     let jsCodeLines = jsCode.split("\n");
     let functions : string[] = [];
     //while I could loop over the token list an get the top level function declarations, I'm not going to get any functions defined in a function
@@ -131,9 +139,9 @@ function listOfFunctions(jsCode: string) : string[] {
     let p = acorn.parse(jsCode, acornOptions)
     walk.ancestor(p, {
         CallExpression(_node, _state, ancestors) {
-            let callInfo = getFunctionCallName(_node, ancestors, jsCodeLines);
-            functions.push(callInfo.callName + " from " + callInfo.calledInFunctions);
-            // console.log("This call expr ancestors are:", ancestors.map(n => n.type))
+            let callInfo = getFunctionCallName(_node, ancestors, jsCodeLines, filePath);
+            //callInfo.callName for parameters
+            functions.push(callInfo.shortCallName + " from " + callInfo.calledInFunctions);
         },
         // FunctionDeclaration(_node, _state, ancestors) {
         //     console.log("got functionDeclaration")
@@ -155,11 +163,12 @@ async function readGlobbed(directory: string, ignores: string[]){
     console.log("*********************")
     for(const filePath of jsfiles){
         let fileContent = await fs.readFile(filePath, 'utf8');
-        let functions = listOfFunctions(fileContent);
+        let functions = listOfFunctions(fileContent, filePath);
         if(functions.length == 0){
             console.log(filePath);
             break;
         }
+        console.log(filePath);
         console.log(functions);
     }
 }

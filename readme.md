@@ -1,6 +1,7 @@
 # To run:
-1. `npm ci` or `npm install`
-2. `npx ts-node src/main.ts`
+1. In `src` folder run: `npm ci`
+2. In the folder above run: `npx ts-node src/main.ts`
+(For some reason, `npx ts-node main.ts` in `src` does not find the `main.ts` although it is right there)
 
 # Node version 20 or newer is required
 For the `glob` package.

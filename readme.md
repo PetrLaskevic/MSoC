@@ -1,3 +1,5 @@
+# To clone:
+The project uses git submodules, so `git clone` alone will not work. It needs a `--recurse-submodules` flag.
 # To run:
 1. In `src` folder run: `npm ci`
 2. In the folder above run: `npx ts-node src/main.ts`

@@ -1,0 +1,3 @@
+[submodule "testProjects/yt-anti-translate"]
+	path = testProjects/yt-anti-translate
+	url = git@github.com:zpix1/yt-anti-translate.git

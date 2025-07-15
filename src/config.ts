@@ -24,5 +24,16 @@ export let config: Config = {
         "**/playwright.config.ts",
         "playwright.config.js",
         "tests/**", 
+        // "!(permission.js)", not supported by glob lib
+        //so: ls testProjects/yt-anti-translate/**/**/.js an then removing the permission.js file
+        // "app/src/background_audio.js",
+        // "app/src/background_description.js",
+        // "app/src/background.js",
+        // "app/src/content_channelbranding.js",
+        // "app/src/content_injectglobal.js",
+        // "app/src/content_start.js",
+        // "app/src/global.js",
+        // "app/src/options.js",
+        // "app/src/permission.js",
     ]
 }

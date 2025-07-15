@@ -82,8 +82,9 @@ interface FunctionCallInfo{
     //i.e ArrayExpression, ObjectExpression etc
     //(objects can be very large, sometimes closest parent is all what is needed for context)
 
-    calledInFunctions: string[]
+    calledFrom: string
 }
+
 function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors: acorn.Node[], code: string[], filePath: string) : FunctionCallInfo {
     //return function call name, the LINE(s) of the CallExpression , and 
     let functionName = getSubStringAcrossLines(callExpressionNode.loc, code);
@@ -91,7 +92,7 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
     //ancestors are in descending direction, from the tree root "Program" to our "CallExpression"
     //traversing backwards, since for example for loops can be nested (we want to return the closest ancestor)
     let parentExpression;
-    let calledFrom : string[] = [];
+    let calledFrom = "";
 
     let foundFunction = false;
     //It seems like the only way to find out where from a call has been made is to go up the ancestor list and report all function declarations on the way
@@ -101,13 +102,32 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
             parentExpression = item;
         }
         if(item.type == "FunctionDeclaration"){
-            calledFrom.push((item as acorn.FunctionDeclaration).id.name);
+            calledFrom = (item as acorn.FunctionDeclaration).id.name;
             foundFunction = true;
+            /*
+            we only need to find the closest function
+            reason, example with nested function decl in a function decl:
+                fn a(){
+                    fn b(){
+                        c();
+                    }
+                    b();
+                }
+            the resulting graph:
+            c from b 
+            b from a
+
+            => so the b() call must be there, else it's dead code and not relevant
+                => when b() is there, the graph will work
+
+            => also meaning, c was called in b, but there was no c() in a directly 
+            */
+            break;
         }
     }
 
     if(!foundFunction){
-        calledFrom.push("top level")
+        calledFrom = "top level";
     }
 
     if(parentExpression == undefined){
@@ -118,41 +138,58 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
         callName: functionName,
         callLocation: callExpressionNode.loc,
         parentExpressionLocation: parentExpression.loc,
-        calledInFunctions: calledFrom
+        calledFrom: calledFrom
     }
 }
 function listOfFunctions(jsCode: string, filePath: string) : string[] {
     let jsCodeLines = jsCode.split("\n");
-    let functions : string[] = [];
-    //while I could loop over the token list an get the top level function declarations, I'm not going to get any functions defined in a function
-    // const tokens: Node[] = acorn.parse(jsCode, acornOptions).body;
-    // console.log(tokens)
-    // tokens.forEach((node) => {
-    //     if(node.type == "FunctionDeclaration"){
-    //         //node.id is another Node with type Identifier
-    //         let name = node.id.name;
-    //         functions.push(name);
-    //     }
-    // });
-    // console.log(tokens);
+    //calledFrom: calledWhat
+    //I believe that every meaninguful function that should appear in this function, must make some function call
+    //except a hypothetical function which would just assign to global or just have a long switch inside
+        //=> for those functions, I will listen for a function declaration
+    const functions = new Map();
 
     let p = acorn.parse(jsCode, acornOptions)
     walk.ancestor(p, {
         CallExpression(_node, _state, ancestors) {
             let callInfo = getFunctionCallName(_node, ancestors, jsCodeLines, filePath);
             //callInfo.callName for parameters
-            functions.push(callInfo.shortCallName + " from " + callInfo.calledInFunctions);
+            if(!functions.has(callInfo.calledFrom)){
+                functions.set(callInfo.calledFrom, []);
+            }
+            functions.get(callInfo.calledFrom).push(callInfo.shortCallName);
+            // functions.push(callInfo.shortCallName + " from " + callInfo.calledInFunctions);
         },
-        // FunctionDeclaration(_node, _state, ancestors) {
-        //     console.log("got functionDeclaration")
+        //type of function declaration from acorn.d.ts
+        // export interface FunctionDeclaration extends Function {
+        //   type: "FunctionDeclaration"
+        //   id: Identifier
+        //   body: BlockStatement
         // }
+        FunctionDeclaration(_node, _state, ancestors) {
+            //for any "insular" function which is not called from anywhere do not have any function calls (CallExpressions) made in them  //like a function which only has a switch case, or just does arithmetic
+            let name = _node.id.name;
+            if(!functions.has(name)){ //string nebo array => dat pozor
+                functions.set(name, []);
+            }
+            // console.log("got functionDeclaration", name);
+        },
+    });
+
+    functions.forEach((value, key, map) => {
+        // value = value.filter(fn => map.has(fn));
+        // even value = []; doesnt seem to do anything at all, probably copied (and not pass by reference)
+        //so this
+        map.set(key, value.filter(fn => map.has(fn)));
     });
 
     // console.log("all nodes\n\n\n");
     // console.dir(p.body, { depth: null })
     // console.dir(acorn.parse(jsCode, acornOptions).body, { depth: null })
-
-    return functions;
+    console.log(filePath, "functions:");
+    console.log(functions);
+    return [];
+    // return functions;
 }
 
 
@@ -164,10 +201,10 @@ async function readGlobbed(directory: string, ignores: string[]){
     for(const filePath of jsfiles){
         let fileContent = await fs.readFile(filePath, 'utf8');
         let functions = listOfFunctions(fileContent, filePath);
-        if(functions.length == 0){
-            console.log(filePath);
-            break;
-        }
+        // if(functions.length == 0){
+        //     console.log(filePath);
+        //     break;
+        // }
         console.log(filePath);
         console.log(functions);
     }

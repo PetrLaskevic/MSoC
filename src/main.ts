@@ -9,6 +9,27 @@ let acornOptions: acorn.Options = {
     locations: true,
 }
 
+function generateMermaidGraphText(fileName: string, oneFileObject: Map<string, string[]>) : string{
+    let result = "";
+    result += `---\n${fileName}\n---\n`;
+    result += "flowchart LR\n"; //LR is left right, a lot more compact than TD = top down
+    for(let [nodeFrom, nodesTo] of oneFileObject.entries()){
+        //A hack for mermaid.js, which can't process a node with a space in its name
+        //Not even with quotes
+        if(nodeFrom == "top level"){
+            nodeFrom = "A[top level]"; //nodeIdentifier[any string] is supported
+        }
+        if(nodesTo.length == 0){
+            result += `${nodeFrom}\n`;
+        }else{
+            for(let nodeTo of nodesTo){
+                result += `${nodeFrom} --> ${nodeTo}\n`;
+            }
+        }
+    }
+    return result;
+}
+
 async function main(): Promise<Map<string, Map<string, string[]>>>{
     let ignores: string[] = [];
     if(config.useGitIgnore == true){
@@ -25,10 +46,14 @@ async function main(): Promise<Map<string, Map<string, string[]>>>{
     }else{
         console.warn("ES version not specified, defaulting to 2020");
     }
-    return readGlobbed(config.analysisTargetDir, ignores);
+    let allFilesCallGraph = await readGlobbed(config.analysisTargetDir, ignores)
+    for(let [fileName, callGraphInside] of allFilesCallGraph){
+        console.log(generateMermaidGraphText(fileName, callGraphInside));
+    }
+    return allFilesCallGraph;
 }
 
-main().then((e) => console.log(e));
+main()//.then((e) => console.log(e));
 
 async function loadGitIgnore(directory: string) : Promise<string[]> {
     const gitignorePath = `${directory}/.gitignore`;

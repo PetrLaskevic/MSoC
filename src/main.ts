@@ -183,9 +183,6 @@ function listOfFunctions(jsCode: string, filePath: string) : Map<string, string[
         map.set(key, value.filter(fn => map.has(fn)));
     });
 
-    // console.log("all nodes\n\n\n");
-    // console.dir(p.body, { depth: null })
-    // console.dir(acorn.parse(jsCode, acornOptions).body, { depth: null })
     return functions;
 }
 
@@ -207,17 +204,3 @@ async function readGlobbed(directory: string, ignores: string[]){
     }
     return allFunctions;
 }
-
-// src/testProjects/yt-anti-translate/app/src/permission.js
-// src/testProjects/yt-anti-translate/app/src/global.js
-// src/testProjects/yt-anti-translate/app/src/content_start.js //ok
-// src/testProjects/yt-anti-translate/app/src/content_injectglobal.js //ok
-
-
-// async function test(){
-//     let fileContent = await fs.readFile("src/testProjects/yt-anti-translate/app/src/background_audio.js", 'utf8');
-//     // listOfFunctions(fileContent);
-//     console.log(listOfFunctions(fileContent));
-// }
-
-// test();

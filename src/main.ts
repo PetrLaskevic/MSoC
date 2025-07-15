@@ -9,7 +9,7 @@ let acornOptions: acorn.Options = {
     locations: true,
 }
 
-async function main(){
+async function main(): Promise<Map<string, Map<string, string[]>>>{
     let ignores: string[] = [];
     if(config.useGitIgnore == true){
         ignores.push(... await loadGitIgnore(config.analysisTargetDir));
@@ -25,10 +25,10 @@ async function main(){
     }else{
         console.warn("ES version not specified, defaulting to 2020");
     }
-    readGlobbed(config.analysisTargetDir, ignores);
+    return readGlobbed(config.analysisTargetDir, ignores);
 }
 
-main();
+main().then((e) => console.log(e));
 
 async function loadGitIgnore(directory: string) : Promise<string[]> {
     const gitignorePath = `${directory}/.gitignore`;
@@ -141,13 +141,13 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
         calledFrom: calledFrom
     }
 }
-function listOfFunctions(jsCode: string, filePath: string) : string[] {
+function listOfFunctions(jsCode: string, filePath: string) : Map<string, string[]> {
     let jsCodeLines = jsCode.split("\n");
     //calledFrom: calledWhat
     //I believe that every meaninguful function that should appear in this function, must make some function call
     //except a hypothetical function which would just assign to global or just have a long switch inside
         //=> for those functions, I will listen for a function declaration
-    const functions = new Map();
+    const functions: Map<string, string[]> = new Map();
 
     let p = acorn.parse(jsCode, acornOptions)
     walk.ancestor(p, {
@@ -167,7 +167,7 @@ function listOfFunctions(jsCode: string, filePath: string) : string[] {
         //   body: BlockStatement
         // }
         FunctionDeclaration(_node, _state, ancestors) {
-            //for any "insular" function which is not called from anywhere do not have any function calls (CallExpressions) made in them  //like a function which only has a switch case, or just does arithmetic
+            //for any "insular" function which is not called from anywhere
             let name = _node.id.name;
             if(!functions.has(name)){ //string nebo array => dat pozor
                 functions.set(name, []);
@@ -186,10 +186,7 @@ function listOfFunctions(jsCode: string, filePath: string) : string[] {
     // console.log("all nodes\n\n\n");
     // console.dir(p.body, { depth: null })
     // console.dir(acorn.parse(jsCode, acornOptions).body, { depth: null })
-    console.log(filePath, "functions:");
-    console.log(functions);
-    return [];
-    // return functions;
+    return functions;
 }
 
 
@@ -198,16 +195,17 @@ async function readGlobbed(directory: string, ignores: string[]){
     //TODO: test how well acorn supports .ts files (if no, tell the user to compile ts files in js first)
     const jsfiles = await glob([`${directory}/**/*.js`, `${directory}/**/*.ts`], { ignore: ignores });
     console.log("*********************")
+    let allFunctions: Map<string, Map<string, string[]>> = new Map();
     for(const filePath of jsfiles){
         let fileContent = await fs.readFile(filePath, 'utf8');
         let functions = listOfFunctions(fileContent, filePath);
-        // if(functions.length == 0){
-        //     console.log(filePath);
-        //     break;
-        // }
-        console.log(filePath);
-        console.log(functions);
+        if(functions.size == 0){
+            console.log("no functions in", filePath);
+            break;
+        }
+        allFunctions.set(filePath, functions);
     }
+    return allFunctions;
 }
 
 // src/testProjects/yt-anti-translate/app/src/permission.js

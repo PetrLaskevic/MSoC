@@ -5,6 +5,10 @@ The project uses git submodules, so `git clone` alone will not work. It needs a 
 2. In the folder above run: `npx ts-node src/main.ts`
 (For some reason, `npx ts-node main.ts` in `src` does not find the `main.ts` although it is right there)
 
+# To view the generated Mermaid graph
+For each file a graph is generated. Paste the graph to [https://mermaid.live](https://mermaid.live)
+(There is also [mermaimaidchart.com](mermaimaidchart.com), but the `.live` page is better since it does not require login).
+
 # Node version 20 or newer is required
 For the `glob` package.
 ```

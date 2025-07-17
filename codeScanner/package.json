@@ -1,4 +1,7 @@
 {
+  "name": "code-scanner",
+  "version": "0.1.0",
+  "main": "main.ts",
   "dependencies": {
     "acorn": "^8.15.0",
     "glob": "^11.0.2",
@@ -7,5 +10,9 @@
   "devDependencies": {
     "@types/node": "^24.0.1",
     "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
   }
 }

@@ -30,7 +30,7 @@ function generateMermaidGraphText(fileName: string, oneFileObject: Map<string, s
     return result;
 }
 
-async function main(): Promise<Map<string, Map<string, string[]>>>{
+export async function main(): Promise<Map<string, Map<string, string[]>>>{
     let ignores: string[] = [];
     if(config.useGitIgnore == true){
         ignores.push(... await loadGitIgnore(config.analysisTargetDir));
@@ -53,7 +53,7 @@ async function main(): Promise<Map<string, Map<string, string[]>>>{
     return allFilesCallGraph;
 }
 
-main()//.then((e) => console.log(e));
+// main()//.then((e) => console.log(e));
 
 async function loadGitIgnore(directory: string) : Promise<string[]> {
     const gitignorePath = `${directory}/.gitignore`;

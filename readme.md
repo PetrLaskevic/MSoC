@@ -6,10 +6,77 @@ The project uses git submodules, so `git clone` alone will not work. It needs a 
 2. Run: `npm ci`
 3. Run: `npx ts-node main.ts`
 
-# To run the SvelteKit frontend:
-1. `npm ci`
-2. `npm run build`
-3. `npm run preview`
+# To run the SvelteKit frontend with the graph text generator:
+1. `npm install`
+2. `npm run dev`
+
+# Folder structure:
+I wanted the two projects to remain independent, since the codeScanner does not need the frontend and in the future it could be used in i.e. GitHub Actions adding mermaid digrams to documentation.
+
+So I needed a good way to import a package I'm building alongside the SvelteKit frontend.
+After a bit of digging, I found "npm workspaces". Before that I tried importing from a relative path, but `vite` - the tool building and running SvelteKit dev server - did not like that.
+
+So, "npm workspaces":
+
+```
+msoc/
+├── readme.md
+├── package.json
+├── frontend/
+│   └── package.json
+│   └── src/
+└── codeScanner/
+    └── package.json
+    └── main.ts
+```
+
+The root `package.json` specifies the workspaces and defines utility scripts. 
+So `npm run dev` (and `npm run build`) works correctly 
+(`cd frontend` and `npm run dev` would be a mistake, as it would result in `npm warn config ignoring workspace config at /home/petr/Documents/msoc/codebase overview/frontend/.npmrc`)
+
+```json
+{
+  "name": "my-monorepo",
+  "private": true,
+  "workspaces": [
+    "codeScanner",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm --workspace frontend run dev",
+    "build": "npm --workspace frontend run build",
+    "scan": "npm --workspace codeScanner run scan"
+  }
+}
+```
+
+Inside "codeScanner" `package.json` I added the `name` entry to make it visible as a dependency:
+```json
+{
+    "name": "code-scanner"
+}
+```
+And I also specified its build scripts for good measure:
+
+```json
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  }
+```
+
+Inside "frontend" `package.json` I had to specify the `code-scanner` dependency.
+The `*` means find any version. NPM will find the `code-scanner` in the adjacent "codeScanner" folder (it matches by `name` in `package.json`, not by folder name) and link it thanks to the workspaces config.
+Else I would have to run through hoops with `npm link` manually. 
+
+```json
+	"dependencies": {
+		"code-scanner": "*"
+	}
+```
+
+The `link` with workspaces happens automatically and it means that to tools like `vite` the import looks just like any other import from npmjs.com published modules in  `node_modules` and it is happy. So `vite` doesn't have the slightest idea that `code-scanner` is instead in reality in an adjacent folder.
+Also if I publish this, I would not have to change the import names anywhere.
 
 # To view the generated Mermaid graph
 For each file a graph is generated. Paste the graph to [https://mermaid.live](https://mermaid.live)

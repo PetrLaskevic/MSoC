@@ -1,0 +1,8 @@
+import { main } from "code-scanner";
+import type { PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async ({ params }) => {
+	return {
+		post: await main()
+	};
+}

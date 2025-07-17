@@ -7,6 +7,7 @@
     }
 
     let currentText = $state("");
+    let selectedFileName = $state("");
     let fileNameDiagram: { [key: string]: string } = $state({});
     for(let diagramText of data.data){
         fileNameDiagram[getName(diagramText)] = diagramText;
@@ -16,7 +17,18 @@
 <h1>BirdsEye</h1>
 
 {#each Object.entries(fileNameDiagram) as [fileName, diagram]}
-    <button onclick={() => currentText = diagram }>{fileName}</button>
+    <button class="item" class:selected={selectedFileName == fileName} onclick={() => {currentText = diagram; selectedFileName = fileName} }>{fileName}</button>
 {/each}
 
 <pre>{currentText}</pre>
+
+<style>
+    .item{
+        margin: 2px;
+        font-size: 1rem;
+    }
+    .selected{
+        outline: 3px solid #6495ed;
+        border-radius: 4px;
+    }
+</style>

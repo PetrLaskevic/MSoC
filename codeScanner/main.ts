@@ -30,7 +30,7 @@ function generateMermaidGraphText(fileName: string, oneFileObject: Map<string, s
     return result;
 }
 
-export async function main(): Promise<Map<string, Map<string, string[]>>>{
+export async function main(): Promise<string[]>{
     let ignores: string[] = [];
     if(config.useGitIgnore == true){
         ignores.push(... await loadGitIgnore(config.analysisTargetDir));
@@ -47,10 +47,11 @@ export async function main(): Promise<Map<string, Map<string, string[]>>>{
         console.warn("ES version not specified, defaulting to 2020");
     }
     let allFilesCallGraph = await readGlobbed(config.analysisTargetDir, ignores)
+    let allDiagrams: string[] = [];
     for(let [fileName, callGraphInside] of allFilesCallGraph){
-        console.log(generateMermaidGraphText(fileName, callGraphInside));
+        allDiagrams.push(generateMermaidGraphText(fileName, callGraphInside));
     }
-    return allFilesCallGraph;
+    return allDiagrams;
 }
 
 // main()//.then((e) => console.log(e));

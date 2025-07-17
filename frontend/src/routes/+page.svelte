@@ -1,10 +1,22 @@
 <script lang="ts">
-    import { main } from "code-scanner";
 	import type { PageProps } from './$types';
-
 	let { data }: PageProps = $props();
+
+    function getName(diagram: string): string{
+        return diagram.split("---")[1].slice("\n../testProjects/".length);
+    }
+
+    let currentText = $state("");
+    let fileNameDiagram: { [key: string]: string } = $state({});
+    for(let diagramText of data.data){
+        fileNameDiagram[getName(diagramText)] = diagramText;
+    }
     console.log(data);
 </script>
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
-<p>{data}</p>
+<h1>BirdsEye</h1>
+
+{#each Object.entries(fileNameDiagram) as [fileName, diagram]}
+    <button onclick={() => currentText = diagram }>{fileName}</button>
+{/each}
+
+<pre>{currentText}</pre>

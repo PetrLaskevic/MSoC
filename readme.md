@@ -1,9 +1,9 @@
 # To clone:
 The project uses git submodules, so `git clone` alone will not work. It needs a `--recurse-submodules` flag.
-# To run:
-1. In `src` folder run: `npm ci`
-2. In the folder above run: `npx ts-node src/main.ts`
-(For some reason, `npx ts-node main.ts` in `src` does not find the `main.ts` although it is right there)
+# To run the call graph Mermaid text generator:
+1. Go to the `codeScanner` folder
+2. Run: `npm ci`
+3. Run: `npx ts-node main.ts`
 
 # To view the generated Mermaid graph
 For each file a graph is generated. Paste the graph to [https://mermaid.live](https://mermaid.live)

@@ -13,7 +13,7 @@ interface Config {
 }
 
 export let config: Config = {
-    analysisTargetDir: "testProjects/yt-anti-translate",
+    analysisTargetDir: "../testProjects/yt-anti-translate",
     useGitIgnore: true,
     otherIgnores: [
         "node_modules",

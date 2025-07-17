@@ -2,6 +2,7 @@
   "name": "code-scanner",
   "version": "0.1.0",
   "main": "main.ts",
+  "type": "module",
   "dependencies": {
     "acorn": "^8.15.0",
     "glob": "^11.0.2",

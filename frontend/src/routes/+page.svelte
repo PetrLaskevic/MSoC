@@ -1,4 +1,5 @@
 <script lang="ts">
+    import mermaid, { type RenderResult } from "mermaid";
 	import type { PageProps } from './$types';
 	let { data }: PageProps = $props();
 
@@ -13,13 +14,21 @@
         fileNameDiagram[getName(diagramText)] = diagramText;
     }
     console.log(data);
+
+    let result: HTMLDivElement;
+    $effect(() => {
+        mermaid.render('mermaid', currentText).then(e => {
+            result.innerHTML = e.svg;
+        });
+    });
 </script>
 <h1>BirdsEye</h1>
 
 {#each Object.entries(fileNameDiagram) as [fileName, diagram]}
-    <button class="item" class:selected={selectedFileName == fileName} onclick={() => {currentText = diagram; selectedFileName = fileName} }>{fileName}</button>
+    <button class="item" class:selected={selectedFileName == fileName} onclick={() => {currentText = diagram; selectedFileName = fileName;mermaid.initialize({ startOnLoad: true });}  }>{fileName}</button>
 {/each}
 
+<div bind:this={result}></div>
 <pre>{currentText}</pre>
 
 <style>

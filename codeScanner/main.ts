@@ -271,7 +271,9 @@ function listOfFunctions(jsCode: string, filePath: string) : Map<string, string[
 async function readGlobbed(directory: string, ignores: string[]){
     console.log(directory, ignores)
     //TODO: test how well acorn supports .ts files (if no, tell the user to compile ts files in js first)
-    const jsfiles = await glob([`${directory}/**/*.js`, `${directory}/**/*.ts`], { ignore: ignores });
+    //=> it doesn't, so removing `${directory}/**/*.ts` from `glob()` arguments
+    //TODO: maybe it could with a plugin, try https://github.com/sveltejs/acorn-typescript
+    const jsfiles = await glob([`${directory}/**/*.js`], { ignore: ignores });
     console.log("*********************")
     let allFunctions: Map<string, Map<string, string[]>> = new Map();
     for(const filePath of jsfiles){

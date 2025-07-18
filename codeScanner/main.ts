@@ -7,6 +7,7 @@ import { exit } from 'node:process';
 let acornOptions: acorn.Options = {
     ecmaVersion: 2020,
     locations: true,
+    sourceType: "module"
 }
 //The configuration for the project you're analyzing
 export interface Config {
@@ -49,9 +50,35 @@ export async function main(config?: Config): Promise<string[]>{
         console.log(`No config parameter supplied, reading ${process.cwd()}/config.ts`);
         try{
             //I wanted to keep config as a .ts (and not .json) file for typechecking and comments (which JSON.Parse wouldn't be happy about)
-            config = (await import(`${process.cwd()}/config.ts`)).config;
+            /*for this dynamic import:
+             - both ts and js work for standalone - just running main.ts with `npx tsx main.ts`
+             - only js works for Sveltekit app importing main.ts and running dev server (no bundler) == npm run dev
+             - neither works with the SvelteKit app importing main.ts and running with a bundler (npm run build && npm run preview)
+                 the ts does not work, saying: 
+                    TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".ts" for /home/petr/Documents/msoc/codebase overview/frontend/config.ts
+                        at Object.getFileProtocolModuleFormat [as file:] (node:internal/modules/esm/get_format:219:9)
+                        at defaultGetFormat (node:internal/modules/esm/get_format:245:36)
+                        at defaultLoad (node:internal/modules/esm/load:120:22)
+                        at async ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:580:32)
+                        at async ModuleJob._link (node:internal/modules/esm/module_job:116:19) {
+                    code: 'ERR_UNKNOWN_FILE_EXTENSION'
+                 => so this was making its way in the final result, not transpiled to js I suppose since else it would be shouting ERR_MODULE_NOT_FOUND and not that .ts ending is weird
+                 => but node version I'm using does not support running TypeScript
+                => and vite preview (which runs when npm run preview is called for the SvelteKit project) 
+                    only runs the .js files = just lets node do it
+                    and does not support inserting `tsx` in the business
+                    => I guess I could dynamically import basically this:
+                            import { register } from 'ts-node';
+                            register();
+                        before the config.ts import
+
+                        but I'm already using tsx for parts of the project (code-scanner)
+                        so this feels meh => maybe it could work tho, idk
+            */
+            config = (await import(`${process.cwd()}/config.js`)).config; 
         } catch (error) {
-            throw Error(`No config.ts in ${process.cwd()} detected`);
+            console.log(error);
+            throw Error(`No config.ts in ${process.cwd()} detected at runtime. If you're using a bundler (webpack/rollup/vite etc.), do not use the "config.ts" file. Instead give config as a parameter to "main"`);
         }
     }
 
@@ -198,6 +225,7 @@ function listOfFunctions(jsCode: string, filePath: string) : Map<string, string[
     //except a hypothetical function which would just assign to global or just have a long switch inside
         //=> for those functions, I will listen for a function declaration
     const functions: Map<string, string[]> = new Map();
+    console.log("jsCode", jsCode, filePath);
     let p = acorn.parse(jsCode, acornOptions)
     walk.ancestor(p, {
         CallExpression(_node, _state, ancestors) {

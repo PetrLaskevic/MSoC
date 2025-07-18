@@ -14,6 +14,7 @@
     "typescript": "^5.8.3"
   },
   "scripts": {
+    "prebuild": "tsc config.ts --module ES6 --target ES6",
     "build": "tsc",
     "dev": "tsc --watch"
   }

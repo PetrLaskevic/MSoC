@@ -8,6 +8,10 @@
   "scripts": {
     "dev": "npm --workspace frontend run dev",
     "build": "npm --workspace frontend run build",
-    "scan": "npm --workspace codeScanner run scan"
+    "scan": "npm --workspace codeScanner run scan",
+    "preview": "npm --workspace frontend run preview"
+  },
+  "dependencies": {
+    "tsx": "^4.20.3"
   }
 }

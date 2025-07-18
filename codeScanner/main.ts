@@ -75,10 +75,10 @@ export async function main(config?: Config): Promise<string[]>{
                         but I'm already using tsx for parts of the project (code-scanner)
                         so this feels meh => maybe it could work tho, idk
             */
-            config = (await import(`${process.cwd()}/config.js`)).config; 
+            config = (await import(`${process.cwd()}/config.ts`)).config; 
         } catch (error) {
             console.log(error);
-            throw Error(`No config.ts in ${process.cwd()} detected at runtime. If you're using a bundler (webpack/rollup/vite etc.), do not use the "config.ts" file. Instead give config as a parameter to "main"`);
+            throw Error(`No config.ts in ${process.cwd()} detected at runtime. \nIf you're using a bundler (webpack/rollup/vite etc.), do not use the "config.ts" file. Instead give config as a parameter to "main"`);
         }
     }
 
@@ -105,7 +105,11 @@ export async function main(config?: Config): Promise<string[]>{
     return allDiagrams;
 }
 
-// main().then((e) => console.log(e));
+//If this is not imported, call main 
+//same idea as __name__ == '__main__' in Python
+if (process.argv[1] === import.meta.filename) {
+    main().then((e) => console.log(e));
+}
 
 async function loadGitIgnore(directory: string) : Promise<string[]> {
     const gitignorePath = `${directory}/.gitignore`;

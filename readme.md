@@ -4,7 +4,7 @@ The project uses git submodules, so `git clone` alone will not work. It needs a 
 # To run the call graph Mermaid text generator:
 1. Go to the `codeScanner` folder
 2. Run: `npm ci`
-3. Run: `npx ts-node main.ts`
+3. Run: `npx tsx main.ts`
 
 # To run the SvelteKit frontend with the graph text generator:
 1. `npm install`

@@ -1,4 +1,4 @@
-import { Config } from "./main.js"; //yes js, that is an ESM & TypeScript quirk
+import { type Config } from "code-scanner"; //yes js, that is an ESM & TypeScript quirk
 
 //applied only if this is the current working directory (i. e. codeScanner is not imported in an other directory)
 export let config: Config = {

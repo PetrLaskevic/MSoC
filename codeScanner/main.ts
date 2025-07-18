@@ -1,12 +1,24 @@
-import { config } from "./config";
 import { glob } from 'glob';
 import * as acorn from "acorn";
 import * as walk from "acorn-walk";
 import * as fs from 'node:fs/promises';
+import { exit } from 'node:process';
 
 let acornOptions: acorn.Options = {
     ecmaVersion: 2020,
     locations: true,
+}
+//The configuration for the project you're analyzing
+export interface Config {
+    //the directory of the project we want to analyze
+    analysisTargetDir: string,
+    //exclude .gitignore entries from analysis?
+    useGitIgnore?: boolean,
+    //What the authors wanted to have in git, but what we want to exclude from analysis
+    //evaluated with analysisTargetDir as base directory
+    otherIgnores?: string[],
+    //default if not specified 2020
+    ecmaScriptVersion?: acorn.Options["ecmaVersion"] //"latest" or number 2020 etc
 }
 
 function generateMermaidGraphText(fileName: string, oneFileObject: Map<string, string[]>) : string{
@@ -30,7 +42,19 @@ function generateMermaidGraphText(fileName: string, oneFileObject: Map<string, s
     return result;
 }
 
-export async function main(): Promise<string[]>{
+export async function main(config?: Config): Promise<string[]>{
+    //either supply config as a parameter or as a TS file with `export config: Config = { ... }` inside 
+    if(!config){
+        const process = await import("node:process");
+        console.log(`No config parameter supplied, reading ${process.cwd()}/config.ts`);
+        try{
+            //I wanted to keep config as a .ts (and not .json) file for typechecking and comments (which JSON.Parse wouldn't be happy about)
+            config = (await import(`${process.cwd()}/config.ts`)).config;
+        } catch (error) {
+            throw Error(`No config.ts in ${process.cwd()} detected`);
+        }
+    }
+
     let ignores: string[] = [];
     if(config.useGitIgnore == true){
         ignores.push(... await loadGitIgnore(config.analysisTargetDir));
@@ -54,7 +78,7 @@ export async function main(): Promise<string[]>{
     return allDiagrams;
 }
 
-// main()//.then((e) => console.log(e));
+// main().then((e) => console.log(e));
 
 async function loadGitIgnore(directory: string) : Promise<string[]> {
     const gitignorePath = `${directory}/.gitignore`;
@@ -174,7 +198,6 @@ function listOfFunctions(jsCode: string, filePath: string) : Map<string, string[
     //except a hypothetical function which would just assign to global or just have a long switch inside
         //=> for those functions, I will listen for a function declaration
     const functions: Map<string, string[]> = new Map();
-
     let p = acorn.parse(jsCode, acornOptions)
     walk.ancestor(p, {
         CallExpression(_node, _state, ancestors) {

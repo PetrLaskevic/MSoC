@@ -5,6 +5,7 @@
         "types": ["node"],
         "outDir": "out",
         "sourceMap": true,
+        "esModuleInterop": true,
     },
     "exclude": ["**/node_modules", "**/testProjects/**"],
 }

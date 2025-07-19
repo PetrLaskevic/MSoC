@@ -1,6 +1,8 @@
 <script lang="ts">
     import mermaid, { type RenderResult } from "mermaid";
 	import type { PageProps } from './$types';
+    import View from "$lib/components/View.svelte";
+    
 	let { data }: PageProps = $props();
 
     function getName(diagram: string): string{
@@ -30,6 +32,8 @@
 
 <div bind:this={result}></div>
 <pre>{currentText}</pre>
+
+<View/>
 
 <style>
     .item{

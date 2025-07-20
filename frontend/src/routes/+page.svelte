@@ -1,43 +1,17 @@
 <script lang="ts">
-    import mermaid, { type RenderResult } from "mermaid";
-	import type { PageProps } from './$types';
-	let { data }: PageProps = $props();
+  import { goto } from '$app/navigation';
+  import { onMount } from 'svelte';
+  import { base } from '$app/paths';
 
-    function getName(diagram: string): string{
-        return diagram.split("---")[1].slice("\n../testProjects/".length);
+  onMount(async () => {
+    // Handle old live editor links and redirect to new version
+    const hash = window.location.hash.split('/');
+    let newURL = 'edit';
+    if (hash.length > 2) {
+      newURL = `${hash[1]}#${hash[2]}`;
     }
-
-    let currentText = $state("");
-    let selectedFileName = $state("");
-    let fileNameDiagram: { [key: string]: string } = $state({});
-    for(let diagramText of data.data){
-        fileNameDiagram[getName(diagramText)] = diagramText;
-    }
-    console.log(data);
-
-    let result: HTMLDivElement;
-    $effect(() => {
-        mermaid.render('mermaid', currentText).then(e => {
-            result.innerHTML = e.svg;
-        });
+    await goto(`${base}/${newURL}`, {
+      replaceState: true
     });
+  });
 </script>
-<h1>BirdsEye</h1>
-
-{#each Object.entries(fileNameDiagram) as [fileName, diagram]}
-    <button class="item" class:selected={selectedFileName == fileName} onclick={() => {currentText = diagram; selectedFileName = fileName;mermaid.initialize({ startOnLoad: true });}  }>{fileName}</button>
-{/each}
-
-<div bind:this={result}></div>
-<pre>{currentText}</pre>
-
-<style>
-    .item{
-        margin: 2px;
-        font-size: 1rem;
-    }
-    .selected{
-        outline: 3px solid #6495ed;
-        border-radius: 4px;
-    }
-</style>

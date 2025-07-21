@@ -1,5 +1,4 @@
 <script lang="ts">
-  import McWrapper from '$/components/McWrapper.svelte';
   import ThemeIcon from '$/components/ThemeIcon.svelte';
   import * as Popover from '$/components/ui/popover';
   import { Switch } from '$/components/ui/switch';
@@ -56,6 +55,8 @@
   </a>
 {/snippet}
 
+<!-- Menu which opens when you click on the icon to the left of "Mermaid Live Editor" 
+ https://www.shadcn-svelte.com/docs/components/popover-->
 <Popover.Root>
   <Popover.Trigger class="shrink-0">
     <img class="size-6" src="/favicon.svg" alt="Mermaid Live Editor" />
@@ -75,13 +76,16 @@
         onCheckedChange={(dark) => setMode(dark ? 'dark' : 'light')} />
     </div>
 
-    {#each mermaidChartMenuItems as item}
-      <McWrapper side="right" shouldCheckDiagramType={item.checkDiagramType}>
-        {@render menuItem({
-          ...item,
-          class: 'text-accent bg-background hover:bg-muted'
-        })}
-      </McWrapper>
-    {/each}
+    <!-- MermaidChart.com Promo Items, they render just fine without McWrapper 
+     pink text color, I assume becuause of text-accent
+    -->
+    <!-- {#each mermaidChartMenuItems as item} -->
+      <!-- <McWrapper side="right" shouldCheckDiagramType={item.checkDiagramType}> -->
+        <!-- {@render menuItem({ -->
+          <!-- ...item, -->
+          <!-- class: 'text-accent bg-background hover:bg-muted' -->
+        <!-- })} -->
+      <!-- </McWrapper> -->
+    <!-- {/each} -->
   </Popover.Content>
 </Popover.Root>

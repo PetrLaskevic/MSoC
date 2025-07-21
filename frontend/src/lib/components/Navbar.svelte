@@ -9,14 +9,9 @@
 
 <script lang="ts">
   import MainMenu from '$/components/MainMenu.svelte';
-  import McWrapper from '$/components/McWrapper.svelte';
-  import { Button } from '$/components/ui/button';
   import { Separator } from '$/components/ui/separator';
-  import { Switch } from '$/components/ui/switch';
-  import { urlsStore } from '$lib/util/state';
   import { MCBaseURL } from '$lib/util/util';
   import type { ComponentProps, Snippet } from 'svelte';
-  import CloseIcon from '~icons/material-symbols/close-rounded';
   import GithubIcon from '~icons/mdi/github';
   import DropdownNavMenu from './DropdownNavMenu.svelte';
 
@@ -58,36 +53,7 @@
         {/if}
         Live Editor
       </a>
-
-      <!-- I suppose the mermaid chart redirect UI switch (playground, more features) -->
-      <McWrapper labelPrefix="Opens the current diagram in">
-        <div class="hidden items-center justify-center gap-4 md:flex">
-          <Separator orientation="vertical" />
-          <Switch
-            id="editorMode"
-            class="data-[state=checked]:bg-secondary"
-            checked={isReferral}
-            onclick={() => {
-              // logEvent('playgroundToggle', { isReferred: isReferral });
-              // Wait for the event to be logged
-              setTimeout(() => {
-                window.open(
-                  $urlsStore.mermaidChart({ medium: 'toggle' }).playground,
-                  '_self',
-                  // Do not send referrer header, if the user already came from playground
-                  isReferral ? 'noreferrer' : ''
-                );
-              }, 100);
-            }} />
-
-          <a
-            href={$urlsStore.mermaidChart({ medium: 'toggle' }).playground}
-            class="whitespace-nowrap">
-            Playground <span class="hidden text-sm opacity-50 lg:inline"
-              >- more features, no account required</span>
-          </a>
-        </div>
-      </McWrapper>
+      <!-- from here I removed the mermaidchart "playground toggle" redirect -->
     </div>
   </div>
   <div

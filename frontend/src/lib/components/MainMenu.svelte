@@ -12,33 +12,12 @@
   import HomeIcon from '~icons/material-symbols/house-outline-rounded';
   import CommunityIcon from '~icons/material-symbols/person-play-outline-rounded';
   import PlaygroundIcon from '~icons/material-symbols/shape-line-outline';
-  import MermaidChartIcon from './MermaidChartIcon.svelte';
 
   const menuItems = $derived([
     { label: 'New Diagram', icon: AddIcon, href: $urlsStore.new },
     { label: 'Home', icon: HomeIcon, href: 'https://mermaid.js.org/' },
     { label: 'Documentation', icon: BookIcon, href: 'https://mermaid.js.org/intro/' },
     { label: 'Community', icon: CommunityIcon, href: 'https://discord.gg/sKeNQX4Wtj' }
-  ]);
-
-  const mermaidChartMenuItems = $derived([
-    {
-      label: 'Edit in Playground',
-      icon: PlaygroundIcon,
-      href: $urlsStore.mermaidChart({ medium: 'main_menu' }).playground
-    },
-    {
-      label: 'Plugins',
-      icon: PluginIcon,
-      href: $urlsStore.mermaidChart({ medium: 'main_menu' }).plugins,
-      checkDiagramType: false
-    },
-    {
-      label: 'MermaidChart',
-      icon: MermaidChartIcon,
-      href: $urlsStore.mermaidChart({ medium: 'main_menu' }).home,
-      checkDiagramType: false
-    }
   ]);
 </script>
 
@@ -75,17 +54,5 @@
         checked={$mode === 'dark'}
         onCheckedChange={(dark) => setMode(dark ? 'dark' : 'light')} />
     </div>
-
-    <!-- MermaidChart.com Promo Items, they render just fine without McWrapper 
-     pink text color, I assume becuause of text-accent
-    -->
-    <!-- {#each mermaidChartMenuItems as item} -->
-      <!-- <McWrapper side="right" shouldCheckDiagramType={item.checkDiagramType}> -->
-        <!-- {@render menuItem({ -->
-          <!-- ...item, -->
-          <!-- class: 'text-accent bg-background hover:bg-muted' -->
-        <!-- })} -->
-      <!-- </McWrapper> -->
-    <!-- {/each} -->
   </Popover.Content>
 </Popover.Root>

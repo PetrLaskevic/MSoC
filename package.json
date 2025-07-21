@@ -3,8 +3,12 @@
   "version": "2.0.67",
   "type": "module",
   "license": "MIT",
+  "workspaces": [
+    "codeScanner",
+    "frontend"
+  ],
   "scripts": {
-    "dev": "vite dev",
+    "dev": "npm --workspace frontend run dev",
     "dev:force": "MERMAID_LOCAL=true pnpm dev --force",
     "dev:test": "pnpm dev",
     "build": "vite build",
@@ -13,7 +17,6 @@
     "lint:fix": "prettier --write --cache . && eslint --fix --ignore-path .gitignore .",
     "format": "prettier --write --cache .",
     "pre-commit": "lint-staged",
-    "postinstall": "svelte-kit sync && (git config blame.ignoreRevsFile .git-blame-ignore-revs || true)",
     "test:unit": "vitest",
     "test:unit:ui": "vitest --ui",
     "test:unit:coverage": "vitest run --coverage",
@@ -27,7 +30,7 @@
     "@iconify-json/material-symbols": "^1.2.20",
     "@iconify-json/mdi": "^1.2.3",
     "@playwright/test": "^1.52.0",
-    "@sveltejs/adapter-static": "3.0.8",
+    "@sveltejs/adapter-node": "^5.2.12",
     "@sveltejs/kit": "2.20.8",
     "@sveltejs/vite-plugin-svelte": "^4.0.4",
     "@types/hammerjs": "^2.0.46",
@@ -56,7 +59,6 @@
     "eslint-plugin-unicorn": "^50.0.1",
     "eslint-plugin-vitest": "^0.5.4",
     "esserializer": "^1.3.11",
-    "husky": "^8.0.3",
     "jsdom": "^25.0.1",
     "lint-staged": "^15.5.1",
     "lucide-svelte": "^0.507.0",
@@ -82,6 +84,10 @@
     "vitest-dom": "^0.1.1"
   },
   "dependencies": {
+    "@chevrotain/regexp-to-ast": "^11.0.3",
+    "vscode-jsonrpc": "^8.2.1",
+		"vscode-languageserver-types": "^3.17.5",
+    "code-scanner": "*",
     "@codemirror/lang-json": "^6.0.1",
     "@codemirror/lang-markdown": "^6.3.2",
     "@codemirror/lang-yaml": "^6.1.2",
@@ -102,7 +108,6 @@
     "mode-watcher": "^0.5.1",
     "monaco-editor": "0.52.2",
     "pako": "2.1.0",
-    "plausible-tracker": "^0.3.9",
     "random-word-slugs": "0.1.7",
     "svg-pan-zoom": "3.6.2",
     "svg2roughjs": "^3.2.1",

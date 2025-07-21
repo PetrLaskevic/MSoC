@@ -11,7 +11,7 @@
   import { browser } from '$app/environment';
   import { waitForRender } from '$lib/util/autoSync';
   import { inputStateStore, stateStore, urlsStore } from '$lib/util/state';
-  import { logEvent } from '$lib/util/stats';
+  // import { logEvent } from '$lib/util/stats';
   import { version as FAVersion } from '@fortawesome/fontawesome-free/package.json';
   import dayjs from 'dayjs';
   import { toBase64 } from 'js-base64';
@@ -150,21 +150,21 @@ ${svgString}`);
 
   const onCopyClipboard = async (event: Event) => {
     await exportImage(event, clipboardCopy);
-    logEvent('copyClipboard');
+    // logEvent('copyClipboard');
   };
 
   const onDownloadPNG = async (event: Event) => {
     await exportImage(event, downloadImage);
-    logEvent('download', {
-      type: 'png'
-    });
+    // logEvent('download', {
+    //   type: 'png'
+    // });
   };
 
   const onDownloadSVG = () => {
     simulateDownload(getFileName('svg'), `data:image/svg+xml;base64,${getBase64SVG()}`);
-    logEvent('download', {
-      type: 'svg'
-    });
+    // logEvent('download', {
+    //   type: 'svg'
+    // });
   };
 
   let gistURL = $state('');
@@ -179,7 +179,7 @@ ${svgString}`);
       return alert('Please enter a Gist URL first');
     }
     window.location.href = `${window.location.pathname}?gist=${gistURL}`;
-    logEvent('loadGist');
+    // logEvent('loadGist');
   };
 
   let imageSizeMode: 'auto' | 'width' | 'height' = $state('auto');

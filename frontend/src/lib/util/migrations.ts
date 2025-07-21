@@ -1,7 +1,7 @@
 import { writable, get, type Writable } from 'svelte/store';
 import { persist, localStorage } from '$lib/util/persist';
 import { injectHistoryIDs } from '$lib/components/History/history';
-import { logEvent } from './stats';
+// import { logEvent } from './stats';
 
 interface MigrationState {
   version: number;
@@ -28,8 +28,8 @@ export const applyMigrations = (): void => {
     const [key, fn] = allMigrations[i];
     console.log(`Applying migration ${i}: ${key}.`);
     fn();
-    logEvent('migration', { key });
+    // logEvent('migration', { key });
     migrationStore.set({ version: i });
   }
-  logEvent('migration', { status: 'complete', from: version, to: allMigrations.length - 1 });
+  // logEvent('migration', { status: 'complete', from: version, to: allMigrations.length - 1 });
 };

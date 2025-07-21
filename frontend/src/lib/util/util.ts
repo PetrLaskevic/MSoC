@@ -3,7 +3,6 @@ import { loadDataFromUrl } from './fileLoaders/loader';
 import { initLoading } from './loading';
 import { applyMigrations } from './migrations';
 import { initURLSubscription, loadState, updateCodeStore, verifyState } from './state';
-import { initAnalytics, plausible } from './stats';
 
 export const loadStateFromURL = (): void => {
   loadState(window.location.hash.slice(1));
@@ -21,8 +20,6 @@ export const initHandler = async (): Promise<void> => {
   await initLoading('Loading Gist...', loadDataFromUrl().catch(console.error));
   syncDiagram();
   initURLSubscription();
-  await initAnalytics();
-  plausible?.trackPageview({ url: window.location.origin + window.location.pathname });
   verifyState();
 };
 

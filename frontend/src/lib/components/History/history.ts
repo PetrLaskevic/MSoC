@@ -1,6 +1,6 @@
 import type { HistoryEntry, HistoryType, Optional } from '$lib/types';
 import { localStorage, persist } from '$lib/util/persist';
-import { logEvent } from '$lib/util/stats';
+// import { logEvent } from '$lib/util/stats';
 import { generateSlug } from 'random-word-slugs';
 import type { Readable, Writable } from 'svelte/store';
 import { derived, get, writable } from 'svelte/store';
@@ -76,14 +76,14 @@ export const addHistoryEntry = (entryToAdd: Optional<HistoryEntry, 'id'>): void 
   }
 
   manualHistoryStore.update((entries) => [entry, ...entries]);
-  logEvent('history', { action: 'save' });
+  // logEvent('history', { action: 'save' });
 };
 
 export const clearHistoryData = (idToClear?: string): void => {
   (get(historyModeStore) === 'auto' ? autoHistoryStore : manualHistoryStore).update((entries) => {
     if (get(historyModeStore) !== 'loader') {
       entries = entries.filter(({ id }) => idToClear && id != idToClear);
-      logEvent('history', { action: 'clear', type: idToClear ? 'single' : 'all' });
+      // logEvent('history', { action: 'clear', type: idToClear ? 'single' : 'all' });
     }
     return entries;
   });
@@ -120,12 +120,12 @@ export const restoreHistory = (data: HistoryEntry[]) => {
         entries.length - entryCount
       } duplicates.`
     );
-    logEvent('history', {
-      action: 'restore',
-      success: entryCount,
-      invalid: invalidEntryCount,
-      duplicates: entries.length - entryCount
-    });
+    // logEvent('history', {
+    //   action: 'restore',
+    //   success: entryCount,
+    //   invalid: invalidEntryCount,
+    //   duplicates: entries.length - entryCount
+    // });
   } else {
     alert('No valid entries found.');
   }

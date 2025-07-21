@@ -4,7 +4,7 @@
   import { render as renderDiagram } from '$/util/mermaid';
   import { PanZoomState } from '$/util/panZoom';
   import { inputStateStore, stateStore, updateCodeStore } from '$/util/state';
-  import { logEvent, saveStatistics } from '$/util/stats';
+  // import { logEvent, saveStatistics } from '$/util/stats';
   import FontAwesome, { mayContainFontAwesome } from '$lib/components/FontAwesome.svelte';
   import uniqueID from 'lodash-es/uniqueId';
   import type { MermaidConfig } from 'mermaid';
@@ -30,7 +30,7 @@
   const setupPanZoomObserver = () => {
     panZoomState.onPanZoomChange = (pan, zoom) => {
       updateCodeStore({ pan, zoom });
-      logEvent('panZoom');
+      // logEvent('panZoom');
     };
   };
 
@@ -127,7 +127,7 @@
       error = true;
     }
     const renderTime = Date.now() - startTime;
-    saveStatistics({ code, diagramType, isRough: state.rough, renderTime });
+    // saveStatistics({ code, diagramType, isRough: state.rough, renderTime });
     recordRenderTime(renderTime, () => {
       $inputStateStore.updateDiagram = true;
     });

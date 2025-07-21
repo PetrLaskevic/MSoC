@@ -20,7 +20,7 @@
   import type { EditorMode, Tab } from '$/types';
   import { PanZoomState } from '$/util/panZoom';
   import { stateStore, updateCodeStore, urlsStore } from '$/util/state';
-  import { logEvent } from '$/util/stats';
+  // import { logEvent } from '$/util/stats';
   import { initHandler } from '$/util/util';
   import { onMount } from 'svelte';
   import CodeIcon from '~icons/custom/code';
@@ -54,7 +54,7 @@
   onMount(async () => {
     await initHandler();
     window.addEventListener('appinstalled', () => {
-      logEvent('pwaInstalled', { isMobile });
+      // logEvent('pwaInstalled', { isMobile });
     });
   });
 
@@ -76,7 +76,7 @@
         class="data-[state=checked]:bg-accent"
         bind:checked={isViewMode}
         onclick={() => {
-          logEvent('mobileViewToggle');
+          // logEvent('mobileViewToggle');
         }} /> View
     </div>
   {/snippet}

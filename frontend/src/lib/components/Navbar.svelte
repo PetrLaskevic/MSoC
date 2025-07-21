@@ -1,10 +1,10 @@
 <script lang="ts" module>
-  import { logEvent, plausible } from '$lib/util/stats';
-  import { version } from 'mermaid/package.json';
+  // import { logEvent, plausible } from '$lib/util/stats';
+  // import { version } from 'mermaid/package.json';
 
-  void logEvent('version', {
-    mermaidVersion: version
-  });
+  // void logEvent('version', {
+  //   mermaidVersion: version
+  // });
 </script>
 
 <script lang="ts">
@@ -59,6 +59,7 @@
         Live Editor
       </a>
 
+      <!-- I suppose the mermaid chart redirect UI switch (playground, more features) -->
       <McWrapper labelPrefix="Opens the current diagram in">
         <div class="hidden items-center justify-center gap-4 md:flex">
           <Separator orientation="vertical" />
@@ -67,7 +68,7 @@
             class="data-[state=checked]:bg-secondary"
             checked={isReferral}
             onclick={() => {
-              logEvent('playgroundToggle', { isReferred: isReferral });
+              // logEvent('playgroundToggle', { isReferred: isReferral });
               // Wait for the event to be logged
               setTimeout(() => {
                 window.open(

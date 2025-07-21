@@ -24,6 +24,10 @@
   import HistoryIcon from '~icons/material-symbols/history';
   import GearIcon from '~icons/material-symbols/settings-outline-rounded';
 
+  import type { PageProps } from './$types';
+	let { data }: PageProps = $props();
+  console.log("codeScanner vystup", data);
+
   const panZoomState = new PanZoomState();
 
   const tabSelectHandler = (tab: Tab) => {

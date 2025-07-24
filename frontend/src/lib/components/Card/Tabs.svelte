@@ -2,7 +2,6 @@
   import { Button } from '$/components/ui/button';
   import { Separator } from '$/components/ui/separator';
   import type { Tab } from '$lib/types';
-  import { fade } from 'svelte/transition';
 
   let {
     tabs,
@@ -27,7 +26,7 @@
 </script>
 
 <div class="flex w-fit cursor-default items-center gap-2">
-  <ul class="flex gap-2 align-middle" transition:fade>
+  <ul class="flex gap-2 align-middle">
     {#each tabs as tab, index}
       <Button
         role="tab"

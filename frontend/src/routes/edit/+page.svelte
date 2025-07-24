@@ -16,7 +16,7 @@
   import View from '$/components/View.svelte';
   import type { EditorMode, Tab } from '$/types';
   import { PanZoomState } from '$/util/panZoom';
-  import { stateStore, updateCodeStore, urlsStore } from '$/util/state';
+  import { stateStore, updateCode, updateCodeStore, urlsStore } from '$/util/state';
   // import { logEvent } from '$/util/stats';
   import { initHandler } from '$/util/util';
   import { onMount } from 'svelte';
@@ -54,6 +54,7 @@
 
   onMount(async () => {
     await initHandler();
+    updateCode(data.data[6]);
     window.addEventListener('appinstalled', () => {
       // logEvent('pwaInstalled', { isMobile });
     });
@@ -107,11 +108,17 @@
               isOpen
               tabs={editorTabs}
               activeTabID={$stateStore.editorMode}
-              isClosable={false}>
+              isClosable={true}>
               {#snippet actions()}
                 <DiagramDocButton />
               {/snippet}
+              <!-- The Card component draws these elements on all tabs -->
+              <!-- I suppose the Editor has some store which makes it reload state 
+                => it is one editor which loads a file each time
+                    => if I scroll down in a diagram, switch to Config and then switch to Code the scroll state is lost 
+              -->
               <Editor {isMobile} />
+              <!-- <p>SKibidi</p> -->
             </Card>
 
             <div class="group flex flex-wrap justify-between gap-4 sm:gap-6">

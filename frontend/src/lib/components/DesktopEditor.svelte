@@ -20,19 +20,30 @@
     overviewRulerLanes: 0
   } satisfies monaco.editor.IStandaloneEditorConstructionOptions;
   let currentText = '';
-
-  const jsonModel = monaco.editor.createModel(
-    '',
-    'json',
-    monaco.Uri.parse('internal://config.json')
-  );
-  const mermaidModel = monaco.editor.createModel(
-    '',
-    'mermaid',
-    monaco.Uri.parse('internal://mermaid.mmd')
-  );
+  let mermaidModel;
+  let jsonModel;
 
   onMount(() => {
+    try{
+      jsonModel = monaco.editor.createModel(
+        '',
+        'json',
+        monaco.Uri.parse('internal://config.json')
+      );
+      mermaidModel = monaco.editor.createModel(
+        '',
+        'mermaid',
+        monaco.Uri.parse('internal://mermaid.mmd')
+      );
+    }catch(e){
+      //if the error is ModelService: Cannot add model because it already exists
+      //then we can get that model, because monaco still remembers it
+      //(this runs when the edit pane with the editor gets closed and opened again)
+      jsonModel = monaco.editor.getModel(monaco.Uri.parse('internal://config.json'));
+      mermaidModel = monaco.editor.getModel(monaco.Uri.parse('internal://mermaid.mmd'));
+    }
+   
+
     self.MonacoEnvironment = {
       getWorker(_, label) {
         if (label === 'json') {

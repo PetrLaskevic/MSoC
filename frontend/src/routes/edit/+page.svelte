@@ -39,7 +39,7 @@
     {
       icon: CodeIcon,
       id: 'code',
-      title: 'Code'
+      title: 'Diagram'
     },
     {
       icon: GearIcon,
@@ -108,10 +108,16 @@
               isOpen
               tabs={editorTabs}
               activeTabID={$stateStore.editorMode}
-              isClosable={true}>
+              isClosable={true}
+              showActionsWhenClosed={false}
+              titleInsteadOfTabsWhenClosed={"Edit Diagram"}
+              iconInsteadOfTabsWhenClosed={{component: CodeIcon}}
+              >
+              
               {#snippet actions()}
                 <DiagramDocButton />
               {/snippet}
+
               <!-- The Card component draws these elements on all tabs -->
               <!-- I suppose the Editor has some store which makes it reload state 
                 => it is one editor which loads a file each time

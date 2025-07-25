@@ -2,26 +2,27 @@
 //for shared functions
 
 export function fileNameListToTree(fileNames){
-    let temp = {}
+    let temp = new Map();
     let global = temp;
     
     for(let a of fileNames){
         let chunks = a.split("/")
         for(let [index, item] of chunks.entries()){
-        if(!temp.hasOwnProperty(item)){
+        if(!temp.has(item)){
             console.log(index)
             if(index != chunks.length -1){
-                temp[item] = {};
+                temp.set(item, new Map());
+                // temp[item] = {};
             }else{
                 // to distinguish between an empty folder and a file
                 // 'permission.js': '' is a file at the end of path
                 // "permission.js": {} would be an awkwardly named folder with no children
-                //or "FILE" instead of "" for clarity
-                temp[item] = "FILE";
+                // temp[item] = "";
+                temp.set(item, "");
             }
             
         }
-        temp = temp[item];
+        temp = temp.get(item);
         }
         temp = global;
     }

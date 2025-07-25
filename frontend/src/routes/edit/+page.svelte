@@ -54,7 +54,7 @@
 
   onMount(async () => {
     await initHandler();
-    updateCode(data.data[6]);
+    updateCode(data.diagrams[6]);
     window.addEventListener('appinstalled', () => {
       // logEvent('pwaInstalled', { isMobile });
     });
@@ -104,8 +104,14 @@
         <Resizable.Pane bind:this={editorPane} defaultSize={30} minSize={15}>
           <div class="flex h-full flex-col gap-4 sm:gap-6">
             <Card
+            title ="Browse"
+            isOpen
+            >
+              <p>Ř IS A LETTER</p>
+            </Card>
+
+            <Card
               onselect={tabSelectHandler}
-              isOpen
               tabs={editorTabs}
               activeTabID={$stateStore.editorMode}
               isClosable={true}

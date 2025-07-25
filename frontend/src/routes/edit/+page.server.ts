@@ -28,6 +28,6 @@ export const load: PageServerLoad = async ({ params }) => {
 			// "app/src/permission.js",
 		]
 	}
-	let data = await main(config);
-	return { data };
+	let [fileNames, diagrams] = await main(config);
+	return { diagrams };
 }

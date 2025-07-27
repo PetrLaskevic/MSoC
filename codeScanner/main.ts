@@ -43,7 +43,9 @@ function generateMermaidGraphText(fileName: string, oneFileObject: Map<string, s
     return result;
 }
 
-export async function main(config?: Config): Promise<string[]>{
+type FileNames = string[];
+type FileDiagrams = string[];
+export async function main(config?: Config): Promise<[FileNames, FileDiagrams]>{
     //either supply config as a parameter or as a TS file with `export config: Config = { ... }` inside 
     if(!config){
         const process = await import("node:process");
@@ -99,16 +101,28 @@ export async function main(config?: Config): Promise<string[]>{
     }
     let allFilesCallGraph = await readGlobbed(config.analysisTargetDir, ignores)
     let allDiagrams: string[] = [];
+    let allFileNames: string[] = [];
     for(let [fileName, callGraphInside] of allFilesCallGraph){
         allDiagrams.push(generateMermaidGraphText(fileName, callGraphInside));
+        allFileNames.push(fileName);
     }
-    return allDiagrams;
+    return [allFileNames, allDiagrams];
 }
 
 //If this is not imported, call main 
 //same idea as __name__ == '__main__' in Python
 if (process.argv[1] === import.meta.filename) {
-    main().then((e) => console.log(e));
+    main({
+    analysisTargetDir: "../../testProjects/yt-anti-translate",
+    useGitIgnore: true,
+    otherIgnores: [
+        "node_modules",
+        ".git",
+        ".github",
+        "eslint.config.js",
+        "playwright.config.js",
+        "tests/**", 
+    ]}).then((e) => console.log(e));
 }
 
 async function loadGitIgnore(directory: string) : Promise<string[]> {

@@ -29,5 +29,5 @@ export const load: PageServerLoad = async ({ params }) => {
 		]
 	}
 	let [fileNames, diagrams] = await main(config);
-	return { diagrams };
+	return { fileNames, diagrams };
 }

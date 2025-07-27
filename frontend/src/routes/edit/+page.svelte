@@ -25,8 +25,11 @@
   import GearIcon from '~icons/material-symbols/settings-outline-rounded';
 
   import type { PageProps } from './$types';
+  import { fileNameListToTree } from "./shared.svelte";
+  import Directory from '$/components/FileSidebar/Directory.svelte';
 	let { data }: PageProps = $props();
   console.log("codeScanner vystup", data);
+  let files = fileNameListToTree(data.fileNames);
 
   const panZoomState = new PanZoomState();
 
@@ -108,6 +111,7 @@
             isOpen
             >
               <p>Ř IS A LETTER</p>
+              <Directory dirObject={files} pathFromStart={""}/>
             </Card>
 
             <Card

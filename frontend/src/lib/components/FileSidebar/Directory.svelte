@@ -58,9 +58,6 @@
         text-align: start;
         font-size: 1rem;
         height: 1.7rem;
-        background-color: transparent;
-        border-style: outset;
-        border-color: rgb(227, 227, 227);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;

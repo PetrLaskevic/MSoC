@@ -10,10 +10,6 @@
         openedFile.path = pathFromStart;
         console.log($state.snapshot(openedFile));
     }
-
-    if(pathFromStart.includes("skibidi")){
-        console.log("THE SKIBIDI:", pathFromStart)
-    }
 </script>
 
 <style>

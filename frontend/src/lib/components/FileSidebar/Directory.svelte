@@ -4,18 +4,15 @@
     import File from "./File.svelte";
     import Directory from "./Directory.svelte";
     import { opened, openFolderPath } from "./index.svelte";
-    import { untrack } from "svelte";
+
     type FileTreeMap = Map<string, FileTreeMap | string>;
     type DirectoryProps = {
         dirObject: FileTreeMap,
         pathFromStart: string,
     }
     let {dirObject, pathFromStart = ""} : DirectoryProps = $props();
-    // pathFromStart += "/" + dirObject.name;
     $inspect(dirObject);
     $inspect(opened);
-
-    let expandFolder = $state(false);
     
     for(let item of dirObject.keys()){
         let openedArr: boolean[] = [];
@@ -24,38 +21,20 @@
         // for(let x = 0; x < dirObject.size; x++){
         //     openedArr.push(false);
         // }
-        opened[pathFromStart + "/" + item] = openedArr; //+ "/" + item
+        opened[pathFromStart + "/" + item] = openedArr;
     }
 
     for(let item of dirObject.keys()){
         let path = pathFromStart + "/" + item;
         if(openFolderPath.path.startsWith(path)){
             console.log("detected", openFolderPath.path, path);
-            // expandFolder = true;
             let openedArr: boolean[] = [];
              for(let x = 0; x < dirObject.size; x++){
                     openedArr.push(true);
             }
             opened[path] = openedArr;
         }
-        // expandFolder = false;
     }
-
-
-    // $effect(() => {
-    //     let openedArr: boolean[] = [];
-    //     console.log("pathFromStart");
-    //     // openFolderPath.path.startsWith(pathFromStart) => everything starts with ""
-    //     if(expandFolder){
-    //         console.log("that happens")
-    //         untrack(() => {
-    //             for(let x = 0; x < dirObject.size; x++){
-    //                 openedArr.push(true);
-    //             }
-    //             opened[pathFromStart] = openedArr;
-    //         });
-    //     }
-    // });
 </script>
 
 <style>

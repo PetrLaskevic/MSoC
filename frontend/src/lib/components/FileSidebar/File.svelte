@@ -24,6 +24,10 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        /* for TailWind which sets padding 0px which does not look good
+         - there is then no space between the left border of the highlighted area (.selected) and the icon
+        */
+        padding: revert !important;
     }
 	button:not(.selected):hover {
 		background-color: lightgray;

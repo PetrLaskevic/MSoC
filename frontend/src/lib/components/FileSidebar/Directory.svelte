@@ -64,6 +64,10 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        /* for TailWind which sets padding 0px which does not look good
+        especially for the top most folder - there is no space between the caretDown and the left border
+        */
+        padding: revert !important;
     }
 </style>
 

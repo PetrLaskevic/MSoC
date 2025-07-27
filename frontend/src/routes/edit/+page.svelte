@@ -27,11 +27,19 @@
   import type { PageProps } from './$types';
   import { fileNameListToTree } from "./shared.svelte";
   import Directory from '$/components/FileSidebar/Directory.svelte';
-	import { open } from '$/components/FileSidebar/index.svelte';
+	import { open, opened, openedFile } from '$/components/FileSidebar/index.svelte';
   let { data }: PageProps = $props();
   console.log("codeScanner vystup", data);
   let files = fileNameListToTree(data.fileNames);
   open(data.fileNames[0]);
+
+  $effect(() => {
+    console.log($state.snapshot(openedFile.path));
+    console.log("ten diagram", $state.snapshot(openedFile.path), data.diagrams[openedFile.path.slice(1)]);
+    //TODO: FIX: FileSidebar expects a path starting with "/" while data.diagrams from codeScanner are always without it
+    //For now, slicing works, but it's better to be consistent
+    updateCode(data.diagrams[openedFile.path.slice(1)]);
+  });
 
   const panZoomState = new PanZoomState();
 
@@ -59,7 +67,6 @@
 
   onMount(async () => {
     await initHandler();
-    updateCode(data.diagrams[6]);
     window.addEventListener('appinstalled', () => {
       // logEvent('pwaInstalled', { isMobile });
     });

@@ -44,8 +44,8 @@ function generateMermaidGraphText(fileName: string, oneFileObject: Map<string, s
 }
 
 type FileNames = string[];
-type FileDiagrams = string[];
-export async function main(config?: Config): Promise<[FileNames, FileDiagrams]>{
+type FileNameDiagramMap = {[key: string]: string};
+export async function main(config?: Config): Promise<[FileNames, FileNameDiagramMap]>{
     //either supply config as a parameter or as a TS file with `export config: Config = { ... }` inside 
     if(!config){
         const process = await import("node:process");
@@ -100,10 +100,10 @@ export async function main(config?: Config): Promise<[FileNames, FileDiagrams]>{
         console.warn("ES version not specified, defaulting to 2020");
     }
     let allFilesCallGraph = await readGlobbed(config.analysisTargetDir, ignores)
-    let allDiagrams: string[] = [];
+    let allDiagrams: FileNameDiagramMap = {};
     let allFileNames: string[] = [];
     for(let [fileName, callGraphInside] of allFilesCallGraph){
-        allDiagrams.push(generateMermaidGraphText(fileName, callGraphInside));
+        allDiagrams[fileName] = generateMermaidGraphText(fileName, callGraphInside);
         allFileNames.push(fileName);
     }
     return [allFileNames, allDiagrams];

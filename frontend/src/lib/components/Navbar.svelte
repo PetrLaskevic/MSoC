@@ -40,7 +40,7 @@
 </script>
 
 
-<nav class="z-50 flex p-4 sm:p-6">
+<nav class="z-50 flex p-4">
   <div class="flex flex-1 items-center gap-4">
     <MainMenu />
     <div

@@ -16,6 +16,7 @@
     icon?: {
       component: Component;
       class?: string;
+      restProps?: any;
     };
     onselect?: (tab: Tab) => void;
     actions?: Snippet;
@@ -58,11 +59,12 @@
   icon?: {
       component: Component;
       class?: string;
+      restProps?: any;
   })}
   {#if (icon || title) || (!isOpen && titleInsteadOfTabsWhenClosed)}
       <span role="menubar" tabindex="0" class="flex w-fit items-center gap-3">
         {#if icon}
-          <icon.component class={icon.class} />
+          <icon.component class={icon.class} {...icon.restProps} />
         {/if}
         {titleInsteadOfTabsWhenClosed || title}
       </span>

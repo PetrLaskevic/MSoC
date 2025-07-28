@@ -23,6 +23,7 @@
   import CodeIcon from '~icons/custom/code';
   import HistoryIcon from '~icons/material-symbols/history';
   import GearIcon from '~icons/material-symbols/settings-outline-rounded';
+  import FolderIcon from "~icons/material-symbols/files"; //or /folder
 
   import type { PageProps } from './$types';
   import { fileNameListToTree } from "./shared.svelte";
@@ -113,13 +114,14 @@
         direction="horizontal"
         autoSaveId="liveEditor"
         class="gap-4 p-2 pt-0 sm:gap-0 sm:pt-0">
+
         <Resizable.Pane bind:this={editorPane} defaultSize={30} minSize={15}>
           <div class="flex h-full flex-col gap-4 sm:gap-6">
             <Card
             title ="Browse"
             isOpen
             isClosable={true}
-            
+            icon={{component: FolderIcon, restProps: {width: "24px", height: "24px"}}}
             >
               <Directory dirObject={files} pathFromStart={""}/>
             </Card>

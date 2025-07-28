@@ -11,8 +11,8 @@
         pathFromStart: string,
     }
     let {dirObject, pathFromStart = ""} : DirectoryProps = $props();
-    $inspect(dirObject);
-    $inspect(opened);
+    // $inspect(dirObject);
+    // $inspect(opened);
     
     for(let item of dirObject.keys()){
         let openedArr: boolean[] = [];

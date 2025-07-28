@@ -118,6 +118,8 @@
             <Card
             title ="Browse"
             isOpen
+            isClosable={true}
+            
             >
               <Directory dirObject={files} pathFromStart={""}/>
             </Card>

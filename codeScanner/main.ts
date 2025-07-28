@@ -269,6 +269,21 @@ function listOfFunctions(jsCode: string, filePath: string) : Map<string, string[
             }
             // console.log("got functionDeclaration", name);
         },
+        // MutationObserver and IntersectionObserver support
+        NewExpression(node){
+            if(
+                node.callee.type == "Identifier" &&
+                (node.callee.name == "MutationObserver" ||
+                node.callee.name == "IntersectionObserver")
+            ){
+                if(node.arguments[0].type != "Identifier"){
+                    throw Error("Cannot process argument of MutationObserver, it is not a function", {cause: node});
+                }
+                let callback = node.arguments[0].name;
+                //TODO: add line info
+                functions.set(node.callee.name, [callback]);
+            }
+        }
     });
 
     functions.forEach((value, key, map) => {

@@ -27,10 +27,10 @@
         padding: revert !important;
     }
 	button:not(.selected):hover {
-		background-color: lightgray;
+		background-color: var(--fileSidebar-hover);
 	}
     .selected{
-        background: #000000bf;
+        background: var(--fileSidebar-selected-bg);
         color: white;
     }
 </style>

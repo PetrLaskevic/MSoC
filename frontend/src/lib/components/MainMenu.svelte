@@ -50,6 +50,7 @@
         <ThemeIcon />
         Dark Mode
       </span>
+      <!-- The setMode function from mode-watcher sets the `dark` class on body -->
       <Switch
         checked={$mode === 'dark'}
         onCheckedChange={(dark) => setMode(dark ? 'dark' : 'light')} />

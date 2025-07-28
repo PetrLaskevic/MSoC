@@ -39,7 +39,7 @@
 
 <style>
 	button:hover {
-		background-color: #dddddd;
+		background-color: var(--fileSidebar-hover); /*#dddddd;*/
 	}
 	button :global(svg.caret) {
 		width: 0.6rem;

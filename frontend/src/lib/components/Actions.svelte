@@ -91,7 +91,8 @@ ${svgString}`);
     if (!context) {
       throw new Error('context not found');
     }
-
+    // I assume this is the dark mode detection in file exports: afaik it was not always reliable
+    // TODO: maybe use mode-watcher to tell us the theme? The project uses it anyway (https://github.com/svecosystem/mode-watcher?tab=readme-ov-file#mode) 
     context.fillStyle = `hsl(${window.getComputedStyle(document.body).getPropertyValue('--background')})`;
     context.fillRect(0, 0, canvas.width, canvas.height);
 

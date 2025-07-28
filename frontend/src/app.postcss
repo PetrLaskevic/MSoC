@@ -26,6 +26,8 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
     --radius: 0.75rem;
+    --fileSidebar-hover: lightgray;
+    --fileSidebar-selected-bg: #000000bf;
   }
   .dark {
     --background: 222.2 84% 4.9%;
@@ -47,6 +49,8 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+    --fileSidebar-hover: hsl(var(--primary) / 1); /*from .bg-primary, before it was too dark: hsl(var(--muted) / var(--tw-bg-opacity, 1))*/
+    --fileSidebar-selected-bg: hsl(var(--accent) / 0.7); /*brown was second contender*/
   }
 }
 

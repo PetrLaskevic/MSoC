@@ -24,6 +24,9 @@
 </script>
 
 <div class="inline-grid">
+  <!-- Key to play a transition whenever $mode value changes
+  src: https://svelte.dev/docs/svelte/key 
+  -->
   {#key $mode}
     <div
       in:spin={{ clockWise: true }}

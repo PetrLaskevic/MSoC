@@ -6,7 +6,6 @@
   import History from '$/components/History/History.svelte';
   import Navbar from '$/components/Navbar.svelte';
   import PanZoomToolbar from '$/components/PanZoomToolbar.svelte';
-  import Preset from '$/components/Preset.svelte';
   import Share from '$/components/Share.svelte';
   import SyncRoughToolbar from '$/components/SyncRoughToolbar.svelte';
   import * as Resizable from '$/components/ui/resizable';
@@ -150,7 +149,6 @@
             </Card>
 
             <div class="group flex flex-wrap justify-between gap-4 sm:gap-6">
-              <Preset />
               <Actions />
             </div>
           </div>

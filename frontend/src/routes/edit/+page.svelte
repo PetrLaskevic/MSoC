@@ -114,7 +114,7 @@
         autoSaveId="liveEditor"
         class="gap-4 p-2 pt-0 sm:gap-0 sm:pt-0">
 
-        <Resizable.Pane bind:this={editorPane} defaultSize={30} minSize={15}>
+        <Resizable.Pane bind:this={editorPane} defaultSize={20} minSize={15}>
           <div class="flex h-full flex-col gap-4 sm:gap-6">
             <Card
             title ="Browse"

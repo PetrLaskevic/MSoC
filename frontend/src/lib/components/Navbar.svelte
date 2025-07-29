@@ -48,10 +48,10 @@
       class="flex items-center justify-center gap-4 font-medium"
       class:flex-row-reverse={isReferral}>
       <a href="/" class="whitespace-nowrap text-accent">
+        BirdsEye
         {#if !isReferral && !mobileToggle}
-          Mermaid
+          - Your Code At A Glance
         {/if}
-        Live Editor
       </a>
       <!-- from here I removed the mermaidchart "playground toggle" redirect -->
     </div>

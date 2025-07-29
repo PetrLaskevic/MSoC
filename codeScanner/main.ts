@@ -113,7 +113,7 @@ export async function main(config?: Config): Promise<[FileNames, FileNameDiagram
 //same idea as __name__ == '__main__' in Python
 if (process.argv[1] === import.meta.filename) {
     main({
-    analysisTargetDir: "../../testProjects/yt-anti-translate",
+    analysisTargetDir: "../testProjects/yt-anti-translate",
     useGitIgnore: true,
     otherIgnores: [
         "node_modules",

@@ -39,7 +39,7 @@
     console.log("ten diagram", $state.snapshot(openedFile.path), data.diagrams[openedFile.path.slice(1)]);
     //TODO: FIX: FileSidebar expects a path starting with "/" while data.diagrams from codeScanner are always without it
     //For now, slicing works, but it's better to be consistent
-    updateCode(data.diagrams[openedFile.path.slice(1)]);
+    updateCode(data.diagrams[openedFile.path.slice(1)], {resetPanZoom: true});
   });
 
   const panZoomState = new PanZoomState();

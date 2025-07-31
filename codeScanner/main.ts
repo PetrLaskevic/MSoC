@@ -193,7 +193,10 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
     //It seems like the only way to find out where from a call has been made is to go up the ancestor list and report all function declarations on the way
     for(let x = ancestors.length - 1; x >= 0; x--){
         let item = ancestors[x];                          //i.e. inside if                       //if(foo())
-        if(["ExpressionStatement", "VariableDeclaration", "LogicalExpression", "ForOfStatement", "IfStatement", "ReturnStatement"].includes(item.type)){
+        if(["ExpressionStatement", "VariableDeclaration", "LogicalExpression", "ForOfStatement", "IfStatement", "ReturnStatement", "ArrowFunctionExpression", "FunctionExpression"].includes(item.type)){
+            //TODO: fix this - same as FunctionDeclaration check, this needs to find the nearest containing structure
+            //using break; is not an option since FunctionDeclaration checks are in the same loop
+            //but a booolean flag will work
             parentExpression = item;
         }
         if(item.type == "FunctionDeclaration"){
@@ -217,6 +220,17 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
 
             => also meaning, c was called in b, but there was no c() in a directly 
             */
+            break;
+        }
+        //called from arrow function () => {} which might not have a name
+        //or it inded might: let foo = () => {}
+        //TODO: support extracting a name from such assignment
+        else if(
+            item.type == "ArrowFunctionExpression" || //() => {}
+            item.type == "FunctionExpression" //function(){}
+        ){
+            calledFrom = `anonymous_function:${item.loc.start.line}`;
+            foundFunction = true;
             break;
         }
     }
@@ -276,21 +290,29 @@ function listOfFunctions(jsCode: string, filePath: string) : Map<string, string[
                 (node.callee.name == "MutationObserver" ||
                 node.callee.name == "IntersectionObserver")
             ){
-                if(node.arguments[0].type != "Identifier"){
+                let line = node.loc.start.line;
+                //new MutationObserver(untranslate)
+                if(node.arguments[0].type == "Identifier"){
+                    let callback = node.arguments[0].name;
+                    functions.set(`${node.callee.name}:${line}`, [callback]);
+                }
+                //new MutationObserver(() => {}), it has no name, but must have a unique identifier - i.e. its line location
+                else if(node.arguments[0].type == "ArrowFunctionExpression"){
+                    let callbackLine = node.arguments[0].loc.start.line;
+                    functions.set(`${node.callee.name}:${line}`, [`anonymous_function:${callbackLine}`]);
+                }else{
                     throw Error("Cannot process argument of MutationObserver, it is not a function", {cause: node});
                 }
-                let callback = node.arguments[0].name;
-                //TODO: add line info
-                functions.set(node.callee.name, [callback]);
             }
         }
     });
 
     functions.forEach((value, key, map) => {
-        // value = value.filter(fn => map.has(fn));
-        // even value = []; doesnt seem to do anything at all, probably copied (and not pass by reference)
-        //so this
-        map.set(key, value.filter(fn => map.has(fn)));
+        
+        map.set(key, value.filter(
+            fn => map.has(fn) || //filters out all JS standard functions (leaves only user defined functions)
+            fn.includes(":")) //allows what we've found notable (anonymous functions) back in
+        );
     });
 
     return functions;

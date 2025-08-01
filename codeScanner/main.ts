@@ -40,6 +40,17 @@ function generateMermaidGraphText(fileName: string, oneFileObject: Map<string, s
             }
         }
     }
+    //loop it the second time, to add the click handler to every node
+    //(the mermaid syntax does not allow it wildcards to specify the same one to all)
+    //hopefully it stands that every node has its own entry
+    //having duplicate click listner statements for every edge (as with nodeTo) would be bad
+    for(let nodeFrom of oneFileObject.keys()){
+        console.log("nodefr", nodeFrom);
+        if(nodeFrom == "top level"){
+            nodeFrom = "A";
+        }
+        result += `click ${nodeFrom} call callback()\n`; //the name of the global function in View.svelte
+    }
     return result;
 }
 
@@ -257,7 +268,7 @@ function listOfFunctions(jsCode: string, filePath: string) : Map<string, string[
     //except a hypothetical function which would just assign to global or just have a long switch inside
         //=> for those functions, I will listen for a function declaration
     const functions: Map<string, string[]> = new Map();
-    console.log("jsCode", jsCode, filePath);
+    // console.log("jsCode", jsCode, filePath);
     let p = acorn.parse(jsCode, acornOptions)
     walk.ancestor(p, {
         CallExpression(_node, _state, ancestors) {

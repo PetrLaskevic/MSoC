@@ -141,6 +141,11 @@
       pendingStateChange = pendingStateChange.then(() => handleStateChange(state).catch(() => {}));
     });
   });
+
+  window.callback = function(){ //event
+    console.log("nice");
+    // console.log(event.target);
+  }
 </script>
 
 <FontAwesome bind:waitForFontAwesomeToLoad />

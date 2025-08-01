@@ -14,6 +14,7 @@ import { localStorage, persist } from './persist';
 import { deserializeState, pakoSerde, serializeState } from './serde';
 import { errorDebug, formatJSON, MCBaseURL } from './util';
 
+//The chart which always briefly flashes before my code graph is rendered on initial page load
 export const defaultState: State = {
   code: `flowchart TD
     A[Christmas] -->|Get money| B(Go shopping)
@@ -24,7 +25,8 @@ export const defaultState: State = {
   `,
   grid: true,
   mermaid: formatJSON({
-    theme: 'default'
+    theme: 'default',
+    securityLevel:'loose' //doesn not seem to do anything here
   }),
   panZoom: true,
   rough: false,
@@ -171,15 +173,8 @@ export const loadState = (data: string): void => {
       typeof state.mermaid === 'string'
         ? (JSON.parse(state.mermaid) as MermaidConfig)
         : state.mermaid;
-    if (
-      mermaidConfig.securityLevel &&
-      mermaidConfig.securityLevel !== 'strict' &&
-      confirm(
-        `Removing "securityLevel":"${mermaidConfig.securityLevel}" from the config for safety.\nClick Cancel if you trust the source of this Diagram.`
-      )
-    ) {
-      delete mermaidConfig.securityLevel; // Prevent setting overriding securityLevel when loading state to mitigate possible XSS attack
-    }
+    //securityLevel loose is required for the click listeners on graph nodes to work
+    mermaidConfig.securityLevel = "loose";
     state.mermaid = formatJSON(mermaidConfig);
   } catch (error) {
     state = get(inputStateStore);

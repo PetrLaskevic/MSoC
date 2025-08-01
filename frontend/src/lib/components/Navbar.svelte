@@ -14,13 +14,17 @@
   import type { ComponentProps, Snippet } from 'svelte';
   import GithubIcon from '~icons/mdi/github';
   import DropdownNavMenu from './DropdownNavMenu.svelte';
-
+  import { Toggle } from '$/components/ui/toggle';
+  import LeftPanelClose from '~icons/material-symbols/left-panel-close';
+  import LeftPanelOpen from '~icons/material-symbols/left-panel-open';
+  import * as Resizable from '$/components/ui/resizable';
   interface Props {
     mobileToggle?: Snippet;
     children: Snippet;
+    editorPane: Resizable.Pane | undefined;
   }
 
-  let { children, mobileToggle }: Props = $props();
+  let { children, mobileToggle, editorPane }: Props = $props();
 
   const isReferral = document.referrer.includes(MCBaseURL);
 
@@ -37,6 +41,14 @@
       href: 'https://github.com/mermaid-js/mermaid-cli'
     }
   ];
+  let closeLeftSidebar = $state(false);
+  $effect(() => {
+    if(closeLeftSidebar){
+      editorPane?.collapse();
+    }else{
+      editorPane?.expand();
+    }
+  });
 </script>
 
 
@@ -53,6 +65,15 @@
           - Your Code At A Glance
         {/if}
       </a>
+      <Separator orientation="vertical" />
+      <Toggle bind:pressed={closeLeftSidebar} size="sm">
+        {#if !closeLeftSidebar}
+          <LeftPanelClose />
+        {:else}
+          <LeftPanelOpen />
+        {/if}
+      </Toggle>
+      
       <!-- from here I removed the mermaidchart "playground toggle" redirect -->
     </div>
   </div>

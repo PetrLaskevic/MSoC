@@ -95,7 +95,21 @@
     </div>
   {/snippet}
 
-  <Navbar mobileToggle={isMobile ? mobileToggle : undefined}>
+  <!-- 
+  right now passing editorPane to Navbar as a "hack"
+  => a more beatiful solution would be to figure out how to render some children to the left and some to the right
+    <Navbar.left> 
+      ...
+    </Navbar.left>
+
+    <Navbar.right>
+      ...
+    </Navbar.right>
+
+    alternatively make "spacer component" between children
+    so things to the left squished to the left and to the right squished to the right
+  -->
+  <Navbar editorPane={editorPane} mobileToggle={isMobile ? mobileToggle : undefined}>
     <Toggle bind:pressed={isHistoryOpen} size="sm">
       <HistoryIcon />
     </Toggle>
@@ -114,7 +128,7 @@
         autoSaveId="liveEditor"
         class="gap-4 p-2 pt-0 sm:gap-0 sm:pt-0">
 
-        <Resizable.Pane bind:this={editorPane} defaultSize={20} minSize={15}>
+        <Resizable.Pane bind:this={editorPane} defaultSize={20} minSize={15} collapsible={true}>
           <div class="flex h-full flex-col gap-4 sm:gap-6">
             <Card
             title ="Browse"

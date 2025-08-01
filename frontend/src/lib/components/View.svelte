@@ -142,8 +142,10 @@
     });
   });
 
-  window.callback = function(){ //event
-    console.log("nice");
+  //has to a global function (window.) because of Mermaid:
+  //https://mermaid.js.org/syntax/flowchart.html#interaction
+  window.callback = function(functionName: string){ //event
+    console.log("nice", functionName);
     // console.log(event.target);
   }
 </script>

@@ -41,15 +41,16 @@ function generateMermaidGraphText(fileName: string, oneFileObject: Map<string, s
         }
     }
     //loop it the second time, to add the click handler to every node
+    //  => I did not inline this because I wanted better readability of the graph text while debugging
     //(the mermaid syntax does not allow it wildcards to specify the same one to all)
     //hopefully it stands that every node has its own entry
-    //having duplicate click listner statements for every edge (as with nodeTo) would be bad
+    //having duplicate click listener statements for every edge (as with nodeTo) would be bad
     for(let nodeFrom of oneFileObject.keys()){
         console.log("nodefr", nodeFrom);
         if(nodeFrom == "top level"){
             nodeFrom = "A";
         }
-        result += `click ${nodeFrom} call callback()\n`; //the name of the global function in View.svelte
+        result += `click ${nodeFrom} call callback('${nodeFrom}')\n`; //the name of the global function in View.svelte
     }
     return result;
 }

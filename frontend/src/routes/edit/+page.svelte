@@ -16,7 +16,6 @@
   import type { EditorMode, Tab } from '$/types';
   import { PanZoomState } from '$/util/panZoom';
   import { stateStore, updateCode, updateCodeStore, urlsStore } from '$/util/state';
-  // import { logEvent } from '$/util/stats';
   import { initHandler } from '$/util/util';
   import { onMount } from 'svelte';
   import CodeIcon from '~icons/custom/code';
@@ -27,7 +26,7 @@
   import type { PageProps } from './$types';
   import { fileNameListToTree } from "./shared.svelte";
   import Directory from '$/components/FileSidebar/Directory.svelte';
-	import { open, opened, openedFile } from '$/components/FileSidebar/index.svelte';
+	import { open, openedFile } from '$/components/FileSidebar/index.svelte';
   let { data }: PageProps = $props();
   console.log("codeScanner vystup", data);
   let files = fileNameListToTree(data.fileNames);
@@ -182,6 +181,7 @@
           <div class="absolute bottom-0 right-0"><VersionSecurityToolbar /></div>
           <div class="absolute bottom-0 left-0 sm:left-5"><SyncRoughToolbar /></div>
         </Resizable.Pane>
+        <!-- right sidebar -->
         {#if isHistoryOpen}
           <Resizable.Handle class="ml-1 hidden opacity-0 sm:block" />
           <Resizable.Pane

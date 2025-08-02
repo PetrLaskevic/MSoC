@@ -46,7 +46,7 @@ function generateMermaidGraphText(fileName: string, oneFileObject: Map<string, s
     //hopefully it stands that every node has its own entry
     //having duplicate click listener statements for every edge (as with nodeTo) would be bad
     for(let nodeFrom of oneFileObject.keys()){
-        console.log("nodefr", nodeFrom);
+        // console.log("nodefr", nodeFrom);
         if(nodeFrom == "top level"){
             nodeFrom = "A";
         }

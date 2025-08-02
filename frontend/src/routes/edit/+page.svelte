@@ -33,12 +33,20 @@
   let files = fileNameListToTree(data.fileNames);
   open(data.fileNames[0]);
 
+
+
   $effect(() => {
     console.log($state.snapshot(openedFile.path));
     console.log("ten diagram", $state.snapshot(openedFile.path), data.diagrams[openedFile.path.slice(1)]);
     //TODO: FIX: FileSidebar expects a path starting with "/" while data.diagrams from codeScanner are always without it
     //For now, slicing works, but it's better to be consistent
     updateCode(data.diagrams[openedFile.path.slice(1)], {resetPanZoom: true});
+
+    fetch("/file?path=" + openedFile.path.slice(1)).then((res) => { //"/file/" + btoa(openedFile.path)
+      res.text().then(json => {
+        console.log(json);
+      })
+    });
   });
 
   const panZoomState = new PanZoomState();

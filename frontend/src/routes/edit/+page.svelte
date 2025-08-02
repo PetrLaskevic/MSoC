@@ -19,14 +19,16 @@
   import { initHandler } from '$/util/util';
   import { onMount } from 'svelte';
   import CodeIcon from '~icons/custom/code';
-  import HistoryIcon from '~icons/material-symbols/history';
   import GearIcon from '~icons/material-symbols/settings-outline-rounded';
   import FolderIcon from "~icons/material-symbols/files"; //or /folder
+  import SourceCodeIcon from "~icons/fa6-solid/code";
 
   import type { PageProps } from './$types';
   import { fileNameListToTree } from "./shared.svelte";
   import Directory from '$/components/FileSidebar/Directory.svelte';
 	import { open, openedFile } from '$/components/FileSidebar/index.svelte';
+  import ReadOnlyCodeViewer from '$/components/ReadOnlyCodeViewer.svelte';
+
   let { data }: PageProps = $props();
   console.log("codeScanner vystup", data);
   let files = fileNameListToTree(data.fileNames);
@@ -42,8 +44,9 @@
     updateCode(data.diagrams[openedFile.path.slice(1)], {resetPanZoom: true});
 
     fetch("/file?path=" + openedFile.path.slice(1)).then((res) => { //"/file/" + btoa(openedFile.path)
-      res.text().then(json => {
-        console.log(json);
+      res.json().then(text => { //text()
+        console.log(text);
+        openedFile.source = text;
       })
     });
   });
@@ -79,7 +82,7 @@
     });
   });
 
-  let isHistoryOpen = $state(false);
+  let isCodePreview = $state(false);
 
   let editorPane: Resizable.Pane | undefined;
   $effect(() => {
@@ -117,8 +120,9 @@
     so things to the left squished to the left and to the right squished to the right
   -->
   <Navbar editorPane={editorPane} mobileToggle={isMobile ? mobileToggle : undefined}>
-    <Toggle bind:pressed={isHistoryOpen} size="sm">
-      <HistoryIcon />
+    <Toggle bind:pressed={isCodePreview} size="sm">
+      <!-- <HistoryIcon /> -->
+      <SourceCodeIcon />
     </Toggle>
     <Share />
     <!-- From here I ripped the "Save" button which was just a redirect to mermaidchart.com -->
@@ -182,13 +186,14 @@
           <div class="absolute bottom-0 left-0 sm:left-5"><SyncRoughToolbar /></div>
         </Resizable.Pane>
         <!-- right sidebar -->
-        {#if isHistoryOpen}
+        {#if isCodePreview}
           <Resizable.Handle class="ml-1 hidden opacity-0 sm:block" />
           <Resizable.Pane
             minSize={15}
             defaultSize={30}
             class="hidden h-full flex-grow flex-col sm:flex">
-            <History />
+            <!-- <History /> -->
+             <ReadOnlyCodeViewer newText={openedFile.source} />
           </Resizable.Pane>
         {/if}
       </Resizable.PaneGroup>

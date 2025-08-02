@@ -1,7 +1,8 @@
 // place files you want to import through the `$lib` alias in this folder.
 export let openedFile = $state({
     name: "",
-    path: ""
+    path: "",
+    source: ""
 });
 
 export let opened: { [key: string]: boolean[]} = $state({ //| ["allOpen"]

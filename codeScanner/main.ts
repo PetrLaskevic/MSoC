@@ -72,7 +72,7 @@ function generateMermaidGraphText(fileName: string, oneFileObject: CodeGraph) : 
             nodeFrom = "A";
         }
         //"callback" = the name of the global function in View.svelte
-        result += `click ${nodeFrom} call callback('${nodeFrom}', ${functionDeclarationLineMap[nodeFrom]})\n`;
+        result += `click ${nodeFrom} call callback('${nodeFrom}', ${functionDeclarationLineMap[nodeFrom] || nodeFrom.split(":")[1]})\n`;
     }
     return result;
 }

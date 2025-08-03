@@ -23,7 +23,27 @@ export interface Config {
     ecmaScriptVersion?: acorn.Options["ecmaVersion"] //"latest" or number 2020 etc
 }
 
-function generateMermaidGraphText(fileName: string, oneFileObject: Map<string, string[]>) : string{
+/*
+Internal graph format which is then used for export to Mermaid format:
+    Stores outgoing calls from each function 
+    (basically, what functions does it depend on to finish its task)
+
+each of the string[] values is a node (key) as well, leaves are represented as `key: []`
+*/
+type CodeGraph = Map<string, string[]>;
+
+
+/**
+ * Converts the internal graph format @param {CodeGraph} oneFileObject to the Mermaid.js graph format
+ * For interactivity it adds click event callbacks to nodes of the Mermaid graph (as per Mermaid official API)
+ *
+ * (For callback functionality, function `callback` must be defined in the global scope where the graph is rendered
+ *  like so: `window.callback = function(nodeName) { ... };`
+ * )
+ * @param {string} fileName is for title of the Mermaid diagram
+ * @returns {string} The Mermaid diagram
+*/
+function generateMermaidGraphText(fileName: string, oneFileObject: CodeGraph) : string{
     let result = "";
     result += `---\n${fileName}\n---\n`;
     result += "flowchart LR\n"; //LR is left right, a lot more compact than TD = top down
@@ -241,15 +261,15 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
  * to return a call-graph
  
  * @param {string} filePath for debugging (gives context where we are currently)
- * @returns {Map<string, string[]>} Outgoing calls from each function (basically, what functions does it depend on to finish its task)
+ * @returns {CodeGraph} Outgoing calls from each function (basically, what functions does it depend on to finish its task)
 */
-function listOfFunctions(jsCode: string, filePath: string) : Map<string, string[]> {
+function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
     let jsCodeLines = jsCode.split("\n");
     //calledFrom: calledWhat
     //I believe that every meaninguful function that should appear in this function, must make some function call
     //except a hypothetical function which would just assign to global or just have a long switch inside
         //=> for those functions, I will listen for a function declaration
-    const functions: Map<string, string[]> = new Map();
+    const functions: CodeGraph = new Map();
     // console.log("jsCode", jsCode, filePath);
     let p = acorn.parse(jsCode, acornOptions)
     walk.ancestor(p, {
@@ -319,16 +339,16 @@ function listOfFunctions(jsCode: string, filePath: string) : Map<string, string[
 * 
 * and generates a call graph for each file.
 *  
-* @returns { Promise<Map<string, Map<string, string[]>>> } Map<filePath, callGraph>
+* @returns { Promise<Map<string, CodeGraph>> } Map<filePath, callGraph>
 */
-async function callGraphPerFileForAllFiles(directory: string, ignores: string[]): Promise<Map<string, Map<string, string[]>>>{
+async function callGraphPerFileForAllFiles(directory: string, ignores: string[]): Promise<Map<string, CodeGraph>>{
     console.log(directory, ignores)
     //TODO: test how well acorn supports .ts files (if no, tell the user to compile ts files in js first)
     //=> it doesn't, so removing `${directory}/**/*.ts` from `glob()` arguments
     //TODO: maybe it could with a plugin, try https://github.com/sveltejs/acorn-typescript
     const jsfiles = await glob([`${directory}/**/*.js`], { ignore: ignores });
     console.log("*********************")
-    let allFunctions: Map<string, Map<string, string[]>> = new Map();
+    let allFunctions: Map<string, CodeGraph> = new Map();
     for(const filePath of jsfiles){
         let fileContent = await fs.readFile(filePath, 'utf8');
         let functions = listOfFunctions(fileContent, filePath);

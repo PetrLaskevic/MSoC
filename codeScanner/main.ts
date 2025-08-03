@@ -112,7 +112,7 @@ export async function main(config?: Config): Promise<[FileNames, FileNameDiagram
     }else{
         console.warn("ES version not specified, defaulting to 2020");
     }
-    let allFilesCallGraph = await readGlobbed(config.analysisTargetDir, ignores)
+    let allFilesCallGraph = await callGraphPerFileForAllFiles(config.analysisTargetDir, ignores)
     let allDiagrams: FileNameDiagramMap = {};
     let allFileNames: string[] = [];
     for(let [fileName, callGraphInside] of allFilesCallGraph){
@@ -234,6 +234,15 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
         calledFrom: calledFrom
     }
 }
+
+/**
+ * From @param {string} jsCode, generates an Abstract-Syntax-Tree (AST),
+ * which it then traverses to find all function calls and function declarations
+ * to return a call-graph
+ 
+ * @param {string} filePath for debugging (gives context where we are currently)
+ * @returns {Map<string, string[]>} Outgoing calls from each function (basically, what functions does it depend on to finish its task)
+*/
 function listOfFunctions(jsCode: string, filePath: string) : Map<string, string[]> {
     let jsCodeLines = jsCode.split("\n");
     //calledFrom: calledWhat
@@ -303,8 +312,16 @@ function listOfFunctions(jsCode: string, filePath: string) : Map<string, string[
     return functions;
 }
 
-
-async function readGlobbed(directory: string, ignores: string[]){
+/**
+* Reads any js files inside @param {string} directory to unlimited depth,
+* using @param {string[]} ignores to limit its search, in `.gitignore` format 
+* (which means bash-like * and ** globs)
+* 
+* and generates a call graph for each file.
+*  
+* @returns { Promise<Map<string, Map<string, string[]>>> } Map<filePath, callGraph>
+*/
+async function callGraphPerFileForAllFiles(directory: string, ignores: string[]): Promise<Map<string, Map<string, string[]>>>{
     console.log(directory, ignores)
     //TODO: test how well acorn supports .ts files (if no, tell the user to compile ts files in js first)
     //=> it doesn't, so removing `${directory}/**/*.ts` from `glob()` arguments

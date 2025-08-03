@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { addHistoryEntry } from '$lib/components/History/history';
 import type { State } from '$lib/types';
 import { defaultState } from '$lib/util/state';
 import { fetchJSON, fetchText } from '$lib/util/util';
@@ -118,14 +117,17 @@ export const loadGistData = async (gistURL: string): Promise<State> => {
     throw new Error('Invalid gist provided');
   }
   const state = getStateFromGist(entry, gistURL);
-  for (const gist of gistHistory) {
-    addHistoryEntry({
-      name: `${gist.author} v${gist.version}`,
-      state: getStateFromGist(gist),
-      time: gist.time,
-      type: 'loader',
-      url: gist.url
-    });
-  }
+  //Removed as I removed the History component altogether:
+  //(It is not needed for my project where the diagrams and code are supposed to be static)
+  //(I allow diagram edits for minor touch-ups but the changes are not meant to be saved anywhere)
+  // for (const gist of gistHistory) {
+  //   addHistoryEntry({
+  //     name: `${gist.author} v${gist.version}`,
+  //     state: getStateFromGist(gist),
+  //     time: gist.time,
+  //     type: 'loader',
+  //     url: gist.url
+  //   });
+  // }
   return state;
 };

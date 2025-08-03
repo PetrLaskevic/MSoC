@@ -3,7 +3,6 @@
   import Card from '$/components/Card/Card.svelte';
   import DiagramDocButton from '$/components/DiagramDocumentationButton.svelte';
   import Editor from '$/components/Editor.svelte';
-  import History from '$/components/History/History.svelte';
   import Navbar from '$/components/Navbar.svelte';
   import PanZoomToolbar from '$/components/PanZoomToolbar.svelte';
   import Share from '$/components/Share.svelte';
@@ -121,7 +120,6 @@
   -->
   <Navbar editorPane={editorPane} mobileToggle={isMobile ? mobileToggle : undefined}>
     <Toggle bind:pressed={isCodePreview} size="sm">
-      <!-- <HistoryIcon /> -->
       <SourceCodeIcon />
     </Toggle>
     <Share />

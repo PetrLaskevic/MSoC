@@ -193,7 +193,7 @@
             defaultSize={30}
             class="hidden h-full flex-grow flex-col sm:flex">
             <!-- <History /> -->
-             <ReadOnlyCodeViewer newText={openedFile.source} />
+             <ReadOnlyCodeViewer jsCode={openedFile.source} />
           </Resizable.Pane>
         {/if}
       </Resizable.PaneGroup>

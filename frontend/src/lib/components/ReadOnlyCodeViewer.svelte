@@ -7,17 +7,21 @@
 	import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 	import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-    let { newText } = $props();
-    let jsCode = newText;
+    let { jsCode } = $props();
+
+    /* reactiveEffectEnabled
+    false for first run, when onMount takes care of initialising and then calls loadCode
+    onMount sets it to true and then effect runs loadCode on changes to ensure reactivity
+    => basically so the $effect runs on any change except the first run when the component mounts
+    => this avoids the previous setTimeout hack, which ran the first loadCode from $effect after the onMount finished running
+    */
+    let reactiveEffectEnabled = $state(false);
     $effect(() => {
-        //this or console.log(newText.length) for this effect to run at all
-        newText.length
-        //the timeout is a hack to make sure loadCode runs after the editor is completely loaded
-        //(onMount is not reactive)
-        //maybe I can put an explicit call in onMount and here a boolean flag
-        setTimeout(() => {
-            loadCode(newText, 'javascript');
-        }, 10);
+        // jsCode; //needed here for the effect to run if reactiveEffectEnabled is not set as reactive
+        //if reactiveEffectEnabled is declared as reactive, `jsCode;` in front needed
+        if(reactiveEffectEnabled){
+            loadCode(jsCode, 'javascript');
+        }
     });
 
 	let editorElement: HTMLDivElement;
@@ -61,6 +65,7 @@
 		});
 
 		loadCode(jsCode, 'javascript');
+        reactiveEffectEnabled = true;
 	});
 
 	onDestroy(() => {

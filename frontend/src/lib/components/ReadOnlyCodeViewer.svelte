@@ -72,6 +72,24 @@
 		monaco?.editor.getModels().forEach((model) => model.dispose());
 		editor?.dispose();
 	});
+
+    export function gotoLine(line: number){
+        //string won't  do, it will complain:
+        // Uncaught Error: Invalid arguments
+        // at StandaloneEditor2._revealLine (chunk-NCECZYJY.js?v=8fb264c1:112690:13)
+        // at StandaloneEditor2.revealLineNearTop (chunk-NCECZYJY.js?v=8fb264c1:112686:10)
+        // at Object.gotoLine (
+        
+        //clicking on chunk-NCECZYJY.js?v=8fb264c1:112690 in browser devtools reveals it:
+        // _revealLine(lineNumber, revealType, scrollType) {
+        //     if (typeof lineNumber !== "number") {
+        //     throw new Error("Invalid arguments");
+        // }
+        
+        line = Number(line);
+  
+        editor.revealLineNearTop(line,1);
+    }
 </script>
 
 <div class="flex h-screen w-full flex-col">

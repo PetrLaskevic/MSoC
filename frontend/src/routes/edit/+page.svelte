@@ -88,6 +88,19 @@
       editorPane?.resize(50);
     }
   });
+
+  let codePreviewElement: ReadOnlyCodeViewer | undefined;
+  //has to a global function (window.) because of Mermaid:
+  //https://mermaid.js.org/syntax/flowchart.html#interaction
+  window.callback = function(functionName: string, line: number){
+    //although I passed a number to Mermaid, it made it a string
+    line = Number(line);
+    console.log("nice", functionName, line);
+    codePreview.show = true;
+    //go to line
+    // gotoLine()
+    codePreviewElement?.gotoLine(line);
+  }
 </script>
 
 <div class="flex h-full flex-col overflow-hidden">
@@ -190,7 +203,7 @@
             defaultSize={30}
             class="hidden h-full flex-grow flex-col sm:flex">
             <!-- <History /> -->
-             <ReadOnlyCodeViewer jsCode={openedFile.source} />
+             <ReadOnlyCodeViewer bind:this={codePreviewElement} jsCode={openedFile.source} />
           </Resizable.Pane>
         {/if}
       </Resizable.PaneGroup>

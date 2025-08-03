@@ -101,6 +101,10 @@
   }
 </script>
 
+<svelte:head>
+   <title>{"BirdsEye - " + openedFile.name}</title>
+</svelte:head>
+
 <div class="flex h-full flex-col overflow-hidden">
   {#snippet mobileToggle()}
     <div class="flex items-center gap-2">

@@ -4,8 +4,8 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ params }) => {
 
  	let config: Config = {
-		analysisTargetDir: "../testProjects/yt-anti-translate",
-		useGitIgnore: true,
+		analysisTargetDir: "../codeScanner", //"../testProjects/yt-anti-translate"
+		useGitIgnore: false, //true
 		otherIgnores: [
 			"node_modules",
 			".git",

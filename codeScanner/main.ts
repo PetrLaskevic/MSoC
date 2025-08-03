@@ -71,7 +71,8 @@ function generateMermaidGraphText(fileName: string, oneFileObject: CodeGraph) : 
         if(nodeFrom == "top level"){
             nodeFrom = "A";
         }
-        result += `click ${nodeFrom} call callback('${nodeFrom}')\n`; //the name of the global function in View.svelte
+        //"callback" = the name of the global function in View.svelte
+        result += `click ${nodeFrom} call callback('${nodeFrom}', ${functionDeclarationLineMap[nodeFrom]})\n`;
     }
     return result;
 }
@@ -79,6 +80,7 @@ function generateMermaidGraphText(fileName: string, oneFileObject: CodeGraph) : 
 type FileNames = string[];
 type FileNameDiagramMap = {[key: string]: string};
 export async function main(config?: Config): Promise<[FileNames, FileNameDiagramMap]>{
+    functionDeclarationLineMap = {};
     //either supply config as a parameter or as a TS file with `export config: Config = { ... }` inside 
     if(!config){
         const process = await import("node:process");
@@ -243,17 +245,19 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
         calledFrom = "top level";
     }
 
-    if(parentExpression == undefined){
-        throw Error("To ne");
-    }
+    // if(parentExpression == undefined){
+    //     throw Error("To ne");
+    // }
     return {
         shortCallName: functionName.split("(")[0],
         callName: functionName,
         callLocation: callExpressionNode.loc,
-        parentExpressionLocation: parentExpression.loc,
+        parentExpressionLocation: parentExpression?.loc,
         calledFrom: calledFrom
     }
 }
+
+let functionDeclarationLineMap : {[key: string]: number}  = {};
 
 /**
  * From @param {string} jsCode, generates an Abstract-Syntax-Tree (AST),
@@ -293,8 +297,10 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
             let name = _node.id.name;
             if(!functions.has(name)){
                 functions.set(name, []);
-
             }
+
+            functionDeclarationLineMap[name] = _node.loc.start.line;
+            console.log(name, _node.loc.start.line);
             // console.log("got functionDeclaration", name);
         },
         // MutationObserver and IntersectionObserver support

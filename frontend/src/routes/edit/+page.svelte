@@ -23,7 +23,7 @@
   import SourceCodeIcon from "~icons/fa6-solid/code";
 
   import type { PageProps } from './$types';
-  import { fileNameListToTree } from "./shared.svelte";
+  import { fileNameListToTree, codePreview } from "$/components/shared.svelte";
   import Directory from '$/components/FileSidebar/Directory.svelte';
 	import { open, openedFile } from '$/components/FileSidebar/index.svelte';
   import ReadOnlyCodeViewer from '$/components/ReadOnlyCodeViewer.svelte';
@@ -81,7 +81,6 @@
     });
   });
 
-  let isCodePreview = $state(false);
 
   let editorPane: Resizable.Pane | undefined;
   $effect(() => {
@@ -119,7 +118,7 @@
     so things to the left squished to the left and to the right squished to the right
   -->
   <Navbar editorPane={editorPane} mobileToggle={isMobile ? mobileToggle : undefined}>
-    <Toggle bind:pressed={isCodePreview} size="sm">
+    <Toggle bind:pressed={codePreview.show} size="sm">
       <SourceCodeIcon />
     </Toggle>
     <Share />
@@ -184,7 +183,7 @@
           <div class="absolute bottom-0 left-0 sm:left-5"><SyncRoughToolbar /></div>
         </Resizable.Pane>
         <!-- right sidebar -->
-        {#if isCodePreview}
+        {#if codePreview.show}
           <Resizable.Handle class="ml-1 hidden opacity-0 sm:block" />
           <Resizable.Pane
             minSize={15}

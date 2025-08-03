@@ -11,6 +11,7 @@
   import { mode } from 'mode-watcher';
   import { onMount } from 'svelte';
   import { Svg2Roughjs } from 'svg2roughjs';
+  import { codePreview } from "$/components/shared.svelte";
 
   let {
     panZoomState = new PanZoomState(),
@@ -144,9 +145,8 @@
 
   //has to a global function (window.) because of Mermaid:
   //https://mermaid.js.org/syntax/flowchart.html#interaction
-  window.callback = function(functionName: string){ //event
-    console.log("nice", functionName);
-    // console.log(event.target);
+  window.callback = function(functionName: string, line: number){
+    console.log("nice", functionName, line);
   }
 </script>
 

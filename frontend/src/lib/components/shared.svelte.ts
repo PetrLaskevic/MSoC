@@ -30,3 +30,7 @@ export function fileNameListToTree(fileNames: string[]): FileTreeMap{
     console.dir(global, {depth: null});
     return global;
 }
+
+export let codePreview = $state({
+    show: false
+});

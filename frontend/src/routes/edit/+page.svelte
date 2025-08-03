@@ -97,8 +97,6 @@
     line = Number(line);
     console.log("nice", functionName, line);
     codePreview.show = true;
-    //go to line
-    // gotoLine()
     codePreviewElement?.gotoLine(line);
   }
 </script>

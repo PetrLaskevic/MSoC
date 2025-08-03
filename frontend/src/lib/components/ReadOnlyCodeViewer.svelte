@@ -74,21 +74,14 @@
 	});
 
     export function gotoLine(line: number){
-        //string won't  do, it will complain:
-        // Uncaught Error: Invalid arguments
-        // at StandaloneEditor2._revealLine (chunk-NCECZYJY.js?v=8fb264c1:112690:13)
-        // at StandaloneEditor2.revealLineNearTop (chunk-NCECZYJY.js?v=8fb264c1:112686:10)
-        // at Object.gotoLine (
-        
-        //clicking on chunk-NCECZYJY.js?v=8fb264c1:112690 in browser devtools reveals it:
-        // _revealLine(lineNumber, revealType, scrollType) {
-        //     if (typeof lineNumber !== "number") {
-        //     throw new Error("Invalid arguments");
-        // }
-        
+        //string from Mermaid won't  do, it will complain:
         line = Number(line);
-  
-        editor.revealLineNearTop(line,1);
+        //Sadly, Monaco doesn't have a way to go to a line AT top, only near top,
+        //which is always off by 14 lines (it seems).
+        //Simple reveal line is happy if the line is anywhere visible on the screen
+        //https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IStandaloneCodeEditor.html#revealLine.revealLine-1
+        //So using revealLineNearTop with the magic number of 14
+        editor.revealLineNearTop(line + 14,1); //1 means immediate scrollType
     }
 </script>
 

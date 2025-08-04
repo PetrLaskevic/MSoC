@@ -34,17 +34,8 @@
       view!.removeEventListener('mousemove', flagged);
     });
 
-    view!.addEventListener('mouseup', (e) => {
-      //works fine if this.isScrolled stays in this function
-      if (this.isScrolled) {
-          e.target!.addEventListener('click', preventClick);
-      } else {
-          e.target!.removeEventListener('click', preventClick);
-      }
-      this.isScrolled = false; 
-      codePreview.isNotPanning = true;
-      view!.removeEventListener('mousemove', flagged);
-    });
+    //The rest of the puzzle for this click-pan (click-drag) detection prevention is in panZoom.ts
+    //Careful testing found that this setup works the best, while not being cleanest code
   });
 
 

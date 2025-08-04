@@ -574,18 +574,19 @@ export const initEditor = (monacoEditor: typeof Monaco): void => {
     colors: {},
     inherit: true,
     rules: [
+      //The styles I commented out were just horrible for light theme, bad contrast ratios (too light/dark)
       { fontStyle: 'bold', foreground: '9650c8', token: 'typeKeyword' },
-      { foreground: '649696', token: 'keyword' },
+      // { foreground: '649696', token: 'keyword' },
       { fontStyle: 'bold', foreground: 'ff0000', token: 'custom-error' },
-      { foreground: 'AA8500', token: 'string' },
+      // { foreground: 'AA8500', token: 'string' }, //ocre color, not bad but I like default reddish brown better
       { fontStyle: 'bold', foreground: '008800', token: 'transition' },
       { fontStyle: 'bold', foreground: '000000', token: 'delimiter.bracket' },
       { foreground: '4b4b96', token: 'annotation' },
       { foreground: '4b4b96', token: 'number' },
       { foreground: '888c89', token: 'comment' },
       { foreground: 'A22889', token: 'variable' },
-      { foreground: '2BDEA8', token: 'type' },
-      { foreground: '9cdcfe', token: 'identifier' }
+      // { foreground: '2BDEA8', token: 'type' },
+      // { foreground: '9cdcfe', token: 'identifier' }
     ]
   });
 

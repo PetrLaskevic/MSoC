@@ -10,6 +10,7 @@
 	import { mode } from 'mode-watcher';
 	//does not run onMount, only on change
 	let themeChangeSubscription = mode.subscribe((mode) => {
+		console.log("theme changed");
 		if(mode == "dark"){
 			monaco.editor.setTheme("vs-dark");
 		}else if(mode == "light"){
@@ -72,8 +73,10 @@
 		monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 
 		let theme = "vs-dark";
-		if(mode.current == "light"){
+		if($mode == "light"){
 			theme = "vs";
+		}else{
+			console.log("mode", $mode);
 		}
 
 		editor = monaco.editor.create(editorElement, {

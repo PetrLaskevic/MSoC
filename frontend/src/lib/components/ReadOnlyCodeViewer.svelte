@@ -7,6 +7,16 @@
 	import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 	import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
+	import { mode } from 'mode-watcher';
+	//does not run onMount, only on change
+	let themeChangeSubscription = mode.subscribe((mode) => {
+		if(mode == "dark"){
+			monaco.editor.setTheme("vs-dark");
+		}else if(mode == "light"){
+			monaco.editor.setTheme("vs");
+		}
+	});
+
     let { jsCode, goToLine } = $props();
 
     /* reactiveEffectEnabled
@@ -61,9 +71,14 @@
 
 		monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 
+		let theme = "vs-dark";
+		if(mode.current == "light"){
+			theme = "vs";
+		}
+
 		editor = monaco.editor.create(editorElement, {
 			automaticLayout: true,
-			theme: 'vs-dark',
+			theme: theme,
             readOnly: true,
             minimap: {
                 enabled: false
@@ -78,6 +93,8 @@
 		monaco?.editor.getModels().forEach((model) => model.dispose());
 		editor?.dispose();
 	});
+
+	onDestroy(themeChangeSubscription);
 
 	//how many lines tall is this compoent
 	function getViewPortLineHeight(){

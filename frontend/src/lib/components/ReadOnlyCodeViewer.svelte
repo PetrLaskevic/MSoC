@@ -7,7 +7,7 @@
 	import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 	import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-    let { jsCode } = $props();
+    let { jsCode, goToLine } = $props();
 
     /* reactiveEffectEnabled
     false for first run, when onMount takes care of initialising and then calls loadCode
@@ -23,6 +23,12 @@
             loadCode(jsCode, 'javascript');
         }
     });
+
+	$effect(() => {
+		if(reactiveEffectEnabled){
+			gotoLine(goToLine);
+		}
+	});
 
 	let editorElement: HTMLDivElement;
 	let editor: monaco.editor.IStandaloneCodeEditor;
@@ -78,7 +84,7 @@
 		return editor.getVisibleRanges()[0].endLineNumber - editor.getVisibleRanges()[0].startLineNumber + 1;
 	}
 
-    export function gotoLine(line: number){
+    function gotoLine(line: number){
         //string from Mermaid won't  do, it will complain:
         line = Number(line);
         //Sadly, Monaco doesn't have a way to go to a line AT top, only near top,

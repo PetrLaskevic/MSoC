@@ -32,5 +32,6 @@ export function fileNameListToTree(fileNames: string[]): FileTreeMap{
 }
 
 export let codePreview = $state({
-    show: false
+    show: false,
+    jumpToLineNumber: 0
 });

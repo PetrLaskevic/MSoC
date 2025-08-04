@@ -1,12 +1,3 @@
-<script lang="ts" module>
-  // import { logEvent, plausible } from '$lib/util/stats';
-  // import { version } from 'mermaid/package.json';
-
-  // void logEvent('version', {
-  //   mermaidVersion: version
-  // });
-</script>
-
 <script lang="ts">
   import MainMenu from '$/components/MainMenu.svelte';
   import { Separator } from '$/components/ui/separator';

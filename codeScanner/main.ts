@@ -5,13 +5,6 @@ import * as fs from 'node:fs/promises';
 import { loadGitIgnore, getSubStringAcrossLines } from './utils.js';
 import { exit } from 'node:process';
 
-var log = console.log;
-
-// console.log = function(){
-//   log.apply(console, [Date.now()].concat(arguments));
-// };
-
-
 let acornOptions: acorn.Options = {
     ecmaVersion: 2020,
     locations: true,
@@ -79,7 +72,6 @@ function generateMermaidGraphText(fileName: string, oneFileObject: CodeGraph) : 
             nodeFrom = "A";
         }
         //"callback" = the name of the global function in View.svelte
-        console.log("accessing", fileName);
         result += `click ${nodeFrom} call callback('${nodeFrom}', ${functionDeclarationLineMap[nodeFrom] || nodeFrom.split(":")[1]})\n`;
     }
     return result;
@@ -145,19 +137,9 @@ export async function main(config?: Config): Promise<[FileNames, FileNameDiagram
     let allFilesCallGraph = await callGraphPerFileForAllFiles(config.analysisTargetDir, ignores)
     let allDiagrams: FileNameDiagramMap = {};
     let allFileNames: string[] = [];
-    //counter is sequential, so order of items should work
-    let counter = 0;
     for(let [fileName, callGraphInside] of allFilesCallGraph){
-        console.log(counter);
-        console.log("diagram start", fileName);
         allDiagrams[fileName] = generateMermaidGraphText(fileName, callGraphInside);
         allFileNames.push(fileName);
-        //should be safe to reset it to avoid issues with same name functions in different files, no?
-        //after all, generateMermaidGraphText has already been called, no?
-        // => wrong, setting this results in undefined for all click callbacks everywhere
-        functionDeclarationLineMap = {};
-        console.log("diagram end", fileName);
-        counter++;
     }
     return [allFileNames, allDiagrams];
 }
@@ -316,7 +298,7 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
             if(!functions.has(name)){
                 functions.set(name, []);
             }
-            console.log("writing", filePath);
+
             functionDeclarationLineMap[name] = _node.loc.start.line;
             console.log(name, _node.loc.start.line);
             // console.log("got functionDeclaration", name);

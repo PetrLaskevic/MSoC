@@ -4,14 +4,49 @@
   import { render as renderDiagram } from '$/util/mermaid';
   import { PanZoomState } from '$/util/panZoom';
   import { inputStateStore, stateStore, updateCodeStore } from '$/util/state';
-  // import { logEvent, saveStatistics } from '$/util/stats';
   import FontAwesome, { mayContainFontAwesome } from '$lib/components/FontAwesome.svelte';
   import uniqueID from 'lodash-es/uniqueId';
   import type { MermaidConfig } from 'mermaid';
   import { mode } from 'mode-watcher';
   import { onMount } from 'svelte';
   import { Svg2Roughjs } from 'svg2roughjs';
-  import { codePreview } from "$/components/shared.svelte";
+  import { codePreview } from './shared.svelte';
+
+  //Since Mermaid has no knowledge of us moving the diagram around (clicking and dragging), it will view such click drag as a click
+  //which causes selection of the clicked node in the editor, so not ideal
+  //So https://stackoverflow.com/a/45098107 from https://stackoverflow.com/questions/18032136/prevent-click-event-after-drag-in-jquery?rq=3
+  function flagged () {
+      // this.isScrolled = true;
+      codePreview.isNotPanning = false; //false
+  }
+  function preventClick (event) {
+    console.log("prevent")
+      event.preventDefault();
+      event.stopImmediatePropagation();
+  }
+  onMount(() => {
+
+    view!.addEventListener('mousedown', () => {
+      view!.addEventListener('mousemove', flagged);
+    });
+
+    view!.addEventListener('mouseup', () => {
+      view!.removeEventListener('mousemove', flagged);
+    });
+
+    view!.addEventListener('mouseup', (e) => {
+      //works fine if this.isScrolled stays in this function
+      if (this.isScrolled) {
+          e.target!.addEventListener('click', preventClick);
+      } else {
+          e.target!.removeEventListener('click', preventClick);
+      }
+      this.isScrolled = false; 
+      codePreview.isNotPanning = true;
+      view!.removeEventListener('mousemove', flagged);
+    });
+  });
+
 
   let {
     panZoomState = new PanZoomState(),

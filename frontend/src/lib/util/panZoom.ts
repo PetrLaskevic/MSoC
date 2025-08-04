@@ -2,6 +2,7 @@ import type { State } from '$/types';
 import Hammer from 'hammerjs';
 import type { Point } from 'mermaid/dist/types.js';
 import panzoom from 'svg-pan-zoom';
+import { codePreview } from '$/components/shared.svelte';
 type PanZoom = typeof panzoom;
 
 export class PanZoomState {
@@ -49,8 +50,28 @@ export class PanZoomState {
             pannedY = event.deltaY;
           };
 
+          // hammer.on("panend", function(event){
+          //   console.log("end of motion");
+          // });
+
+          hammer.on('panstart', function(event){
+            // console.log("start of motion");
+            codePreview.isNotPanning = false;
+          })
+
+          document.addEventListener("mouseup", function(event){
+              // console.log("stop of motion")
+              //this is too early
+              // codePreview.isNotPanning = true;
+              // so to be extra sure
+              setTimeout(() => {
+                codePreview.isNotPanning = true
+              }, 20);
+          });
+
           hammer.get('pinch').set({ enable: true });
           hammer.on('panstart panmove', function (event) {
+            codePreview.isNotPanning = false;
             if (event.type === 'panstart') {
               resetPanned();
             }
@@ -151,6 +172,7 @@ export class PanZoomState {
   public reset() {
     this.pzoom?.reset();
     // Zoom out a bit to avoid overlap with the toolbar
+    //TODO: tohle je proč to má menší než optimální velikost
     this.pzoom?.zoom(0.875);
     this.isDirty = false;
   }

@@ -96,8 +96,13 @@
     //although I passed a number to Mermaid, it made it a string
     line = Number(line);
     console.log("nice", functionName, line);
-    codePreview.jumpToLineNumber = line;
-    codePreview.show = true;
+    // console.log($state.snapshot(codePreview))
+    if(codePreview.isNotPanning){
+      codePreview.jumpToLineNumber = line;
+      codePreview.show = true;
+    }else{
+      console.log("pan detected not switching")
+    }
   }
 </script>
 

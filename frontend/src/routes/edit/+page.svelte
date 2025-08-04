@@ -34,7 +34,7 @@
   open(data.fileNames[0]);
 
 
-
+  // Switches file (diagram source, loads source code, resets scroll on editor)
   $effect(() => {
     console.log($state.snapshot(openedFile.path));
     console.log("ten diagram", $state.snapshot(openedFile.path), data.diagrams[openedFile.path.slice(1)]);
@@ -46,6 +46,7 @@
       res.json().then(text => { //text()
         console.log(text);
         openedFile.source = text;
+        codePreview.jumpToLineNumber = 0;
       })
     });
   });

@@ -6,6 +6,15 @@ The project uses git submodules, so `git clone` alone will not work. It needs a 
 2. Run: `npm ci`
 3. Run: `npx tsx main.ts`
 
+## To run it with a debugger (in VSCode):
+
+1. Open VSCode in the `codeScanner` folder (NOT ANY FOLDER ABOVE)
+2. Step 1 is important so the correct `.vscode` folder (so `tasks.json` and `launch.json`) gets applied
+3. Open `main.ts`
+4. Press `F5`, this should run the program, and stop it at any breakpoints you choose
+
+If you don't use VSCode, just run `tsc` in `codeScanner` before debugging it like you do any other Javascript (this is what the VSCode setup does anyway, just with a fancy one button click).
+
 # To run the SvelteKit frontend with the graph text generator:
 1. `npm install`
 2. `npm run dev`

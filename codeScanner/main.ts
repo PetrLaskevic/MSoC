@@ -32,6 +32,8 @@ each of the string[] values is a node (key) as well, leaves are represented as `
 */
 type CodeGraph = Map<string, string[]>;
 
+let functionDeclarationLineMap : {[FilePath: string]: {[FunctionName: string]: number}}  = {};
+
 
 /**
  * Converts the internal graph format @param {CodeGraph} oneFileObject to the Mermaid.js graph format
@@ -40,12 +42,12 @@ type CodeGraph = Map<string, string[]>;
  * (For callback functionality, function `callback` must be defined in the global scope where the graph is rendered
  *  like so: `window.callback = function(nodeName) { ... };`
  * )
- * @param {string} fileName is for title of the Mermaid diagram
+ * @param {string} filePath is for title of the Mermaid diagram
  * @returns {string} The Mermaid diagram
 */
-function generateMermaidGraphText(fileName: string, oneFileObject: CodeGraph) : string{
+function generateMermaidGraphText(filePath: string, oneFileObject: CodeGraph) : string{
     let result = "";
-    result += `---\n${fileName}\n---\n`;
+    result += `---\n${filePath}\n---\n`;
     result += "flowchart LR\n"; //LR is left right, a lot more compact than TD = top down
     for(let [nodeFrom, nodesTo] of oneFileObject.entries()){
         //A hack for mermaid.js, which can't process a node with a space in its name
@@ -72,7 +74,9 @@ function generateMermaidGraphText(fileName: string, oneFileObject: CodeGraph) : 
             nodeFrom = "A";
         }
         //"callback" = the name of the global function in View.svelte
-        result += `click ${nodeFrom} call callback('${nodeFrom}', ${functionDeclarationLineMap[nodeFrom] || nodeFrom.split(":")[1]})\n`;
+        //since we can't detect any functions in global.js properly at all, so functionDeclarationLineMap[filePath] is undefined
+        //use optional chaining between computed property (the []) accesses, with its weird ?. syntax
+        result += `click ${nodeFrom} call callback('${nodeFrom}', ${functionDeclarationLineMap[filePath]?.[nodeFrom] || nodeFrom.split(":")[1]})\n`;
     }
     return result;
 }
@@ -136,12 +140,12 @@ export async function main(config?: Config): Promise<[FileNames, FileNameDiagram
     }
     let allFilesCallGraph = await callGraphPerFileForAllFiles(config.analysisTargetDir, ignores)
     let allDiagrams: FileNameDiagramMap = {};
-    let allFileNames: string[] = [];
-    for(let [fileName, callGraphInside] of allFilesCallGraph){
-        allDiagrams[fileName] = generateMermaidGraphText(fileName, callGraphInside);
-        allFileNames.push(fileName);
+    let allFilePaths: string[] = [];
+    for(let [filePath, callGraphInside] of allFilesCallGraph){
+        allDiagrams[filePath] = generateMermaidGraphText(filePath, callGraphInside);
+        allFilePaths.push(filePath);
     }
-    return [allFileNames, allDiagrams];
+    return [allFilePaths, allDiagrams];
 }
 
 //If this is not imported, call main 
@@ -257,14 +261,12 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
     }
 }
 
-let functionDeclarationLineMap : {[key: string]: number}  = {};
-
 /**
  * From @param {string} jsCode, generates an Abstract-Syntax-Tree (AST),
  * which it then traverses to find all function calls and function declarations
  * to return a call-graph
  
- * @param {string} filePath for debugging (gives context where we are currently)
+ * @param {string} filePath for storing function declaration locations per file and for debugging (gives context where we are currently)
  * @returns {CodeGraph} Outgoing calls from each function (basically, what functions does it depend on to finish its task)
 */
 function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
@@ -298,8 +300,11 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
             if(!functions.has(name)){
                 functions.set(name, []);
             }
-
-            functionDeclarationLineMap[name] = _node.loc.start.line;
+            
+            if(!functionDeclarationLineMap[filePath]){
+                functionDeclarationLineMap[filePath] = {};
+            }
+            functionDeclarationLineMap[filePath][name] = _node.loc.start.line;
             console.log(name, _node.loc.start.line);
             // console.log("got functionDeclaration", name);
         },

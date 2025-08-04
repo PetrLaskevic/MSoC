@@ -7,7 +7,8 @@ export async function loadGitIgnore(directory: string) : Promise<string[]> {
         const gitignoreContent: string = await fs.readFile(gitignorePath, 'utf8');
         return gitignoreContent.split('\n').filter(line => line && !line.startsWith('#'));
     } catch (error) {
-        throw Error(`No .gitignore in ${directory} detected, but config.useGitIgnore == true`);
+        const process = await import("node:process");
+        throw Error(`No .gitignore in "${directory}" resolved from "${process.cwd()}" detected, but config.useGitIgnore == true`);
     }
 }
 

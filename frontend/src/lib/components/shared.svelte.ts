@@ -10,7 +10,12 @@ export function fileNameListToTree(fileNames: string[]): FileTreeMap{
     let global = temp;
     
     for(let a of fileNames){
-        let chunks = a.split("/")
+        //For Windows compatibility, replace \ with /
+        //side effect, having \ in Linux filenames is technically possible, so that would be a breaking change
+        //there could be a check for that = checking if the path includes \ and /
+        //but probably, this wont happen
+        a = a.replaceAll("\\", "/");
+        let chunks = a.split("/");
         for(let [index, item] of chunks.entries()){
             if(!temp.has(item)){
                 console.log(index)

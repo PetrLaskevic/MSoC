@@ -2,7 +2,8 @@
 export let openedFile = $state({
     name: "",
     path: "",
-    source: ""
+    source: "",
+    convertToBackslashes: false
 });
 
 export let opened: { [key: string]: boolean[]} = $state({ //| ["allOpen"]
@@ -13,6 +14,7 @@ export let opened: { [key: string]: boolean[]} = $state({ //| ["allOpen"]
 export let openFolderPath = $state({path: ""});
 
 export function open(filePath: string){
+    filePath = filePath.replaceAll("\\", "/");
     console.log("opening programmatically", filePath);
     if(!filePath.startsWith("/")){
         filePath = "/" + filePath;

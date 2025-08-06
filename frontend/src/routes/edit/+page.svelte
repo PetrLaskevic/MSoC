@@ -36,13 +36,18 @@
 
   // Switches file (diagram source, loads source code, resets scroll on editor)
   $effect(() => {
+    let pathOfDiagram = openedFile.path.slice(1);
+    if(openedFile.convertToBackslashes){
+      pathOfDiagram = pathOfDiagram.replaceAll("/", "\\");
+    }
     console.log($state.snapshot(openedFile.path));
-    console.log("ten diagram", $state.snapshot(openedFile.path), data.diagrams[openedFile.path.slice(1)]);
+    console.log("ten diagram", $state.snapshot(pathOfDiagram), data.diagrams[pathOfDiagram]);
     //TODO: FIX: FileSidebar expects a path starting with "/" while data.diagrams from codeScanner are always without it
     //For now, slicing works, but it's better to be consistent
-    updateCode(data.diagrams[openedFile.path.slice(1)], {resetPanZoom: true});
+    updateCode(data.diagrams[pathOfDiagram], {resetPanZoom: true});
 
-    fetch("/file?path=" + openedFile.path.slice(1)).then((res) => { //"/file/" + btoa(openedFile.path)
+    //interestingly this, and the node.js FS backend of the API was OK with forward slashes on Windows 
+    fetch("/file?path=" + pathOfDiagram).then((res) => { //"/file/" + btoa(openedFile.path)
       res.json().then(text => { //text()
         console.log(text);
         openedFile.source = text;

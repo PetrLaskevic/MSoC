@@ -239,6 +239,37 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
             item.type == "ArrowFunctionExpression" || //() => {}
             item.type == "FunctionExpression" //function(){}
         ){
+            //For functions defined as properties of objects: let a = {setLogLevel: function (levelName) {}}
+            if(ancestors[x-1]?.type == "Property"){
+                calledFrom = ((ancestors[x-1] as acorn.Property)!.key as acorn.Identifier)!.name //setLogLevel
+                foundFunction = true;
+                //Add it to function declarations
+                if(!functionDeclarationLineMap[filePath]){
+                    functionDeclarationLineMap[filePath] = {};
+                }
+                //Search the rest of ancestors for the name of the object this is assigned to
+                let assignedTo = "";
+                for(x - 1; x >= 0; x--){
+                    if(ancestors[x].type == "AssignmentExpression"){
+                        ((ancestors[x] as acorn.AssignmentExpression).left as acorn.Identifier).name 
+                        let leftSide = (ancestors[x] as acorn.AssignmentExpression).left;
+                        if(leftSide.type == "Identifier"){
+                            assignedTo = leftSide.name;
+                            break;
+                        }else if(leftSide.type == "MemberExpression"){
+                            //this should also be done recursively... (as it can be nested unlimitedly)
+                            //or just take my favorite shortcut
+                            assignedTo = getSubStringAcrossLines(leftSide.loc, code);
+                            break;
+                        }
+                    }
+                }
+                if(assignedTo){
+                    calledFrom = assignedTo + "." + calledFrom;
+                }
+                functionDeclarationLineMap[filePath][calledFrom] = item.loc.start.line;
+                break;
+            }
             calledFrom = `anonymous_function:${item.loc.start.line}`;
             foundFunction = true;
             break;

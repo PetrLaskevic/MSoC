@@ -213,17 +213,10 @@ interface FunctionCallInfo{
     calledFrom: string
 }
 
-function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors: acorn.Node[], code: string[], filePath: string) : FunctionCallInfo {
-    //return function call name, the LINE(s) of the CallExpression , and 
-    let functionName = getSubStringAcrossLines(callExpressionNode.loc, code);
-    //Afaik, there should be only one, they can't be nested
-    //ancestors are in descending direction, from the tree root "Program" to our "CallExpression"
-    //traversing backwards, since for example for loops can be nested (we want to return the closest ancestor)
+function getCurrentFunctionBodyNameAndCallContext(ancestors: acorn.Node[], code: string[], filePath: string): [string, acorn.Node]{
     let parentExpression;
     let calledFrom = "";
-
     let foundFunction = false;
-    //It seems like the only way to find out where from a call has been made is to go up the ancestor list and report all function declarations on the way
     for(let x = ancestors.length - 1; x >= 0; x--){
         let item = ancestors[x];                          //i.e. inside if                       //if(foo())
         if(["ExpressionStatement", "VariableDeclaration", "LogicalExpression", "ForOfStatement", "IfStatement", "ReturnStatement", "ArrowFunctionExpression", "FunctionExpression"].includes(item.type)){
@@ -303,6 +296,18 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
     if(!foundFunction){
         calledFrom = "top level";
     }
+    return [calledFrom, parentExpression];
+}
+
+function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors: acorn.Node[], code: string[], filePath: string) : FunctionCallInfo {
+    //return function call name, the LINE(s) of the CallExpression , and 
+    let functionName = getSubStringAcrossLines(callExpressionNode.loc, code);
+    //Afaik, there should be only one, they can't be nested
+    //ancestors are in descending direction, from the tree root "Program" to our "CallExpression"
+    //traversing backwards, since for example for loops can be nested (we want to return the closest ancestor)
+
+    //It seems like the only way to find out where from a call has been made is to go up the ancestor list and report all function declarations on the way
+    let [calledFrom, parentExpression] = getCurrentFunctionBodyNameAndCallContext(ancestors, code, filePath);
 
     // if(parentExpression == undefined){
     //     throw Error("To ne");
@@ -345,7 +350,7 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
                     start: {line: 0, column: 0},
                     end:   {line: 0, column: 0}
                 };
-                //The name location until the start of the callacj argument
+                //The name location until the start of the callback argument
                 realShortCallNameLoc.start = callInfo.callLocation.start;
                 realShortCallNameLoc.end = _node.arguments[1].loc.start;
                 //'document.getElementById("save-api-key-button").addEventListener("click",' 
@@ -434,7 +439,7 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
             // console.log("got functionDeclaration", name);
         },
         // MutationObserver and IntersectionObserver support
-        NewExpression(node){
+        NewExpression(node, _state, ancestors){
             if(
                 node.callee.type == "Identifier" &&
                 (node.callee.name == "MutationObserver" ||
@@ -453,6 +458,12 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
                 }else{
                     throw Error("Cannot process argument of MutationObserver, it is not a function", {cause: node});
                 }
+                //MutationObserver is not always in "top level" so:
+                let [appearedInContext, _] = getCurrentFunctionBodyNameAndCallContext(ancestors, jsCodeLines, filePath);
+                if(!functions.has(appearedInContext)){
+                    functions.set(appearedInContext, []);
+                }
+                functions.get(appearedInContext).push(`${node.callee.name}:${line}`);
             }
         }
     });

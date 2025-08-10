@@ -33,6 +33,15 @@ type CodeGraph = Map<string, string[]>;
 
 let functionDeclarationLineMap : {[FilePath: string]: {[FunctionName: string]: number}}  = {};
 
+//I want to have () in addEventListener node text, to communicate the type of event
+//For that, "" are needed => which only works inside: someIdentifier["text()"]
+function sanitizeEventListenerForMermaid(node: string){
+    if(node.includes("addEventListener")){
+        //So just remove brackets from the identifier
+        node = `${node.replaceAll(/\(|\)/g, "")}["\`${node}\`"]`;
+    }
+    return node;
+}
 
 /**
  * Converts the internal graph format @param {CodeGraph} oneFileObject to the Mermaid.js graph format
@@ -54,16 +63,14 @@ function generateMermaidGraphText(filePath: string, oneFileObject: CodeGraph) : 
         if(nodeFrom == "top level"){
             nodeFrom = "A[top level]"; //nodeIdentifier[any string] is supported
         }
-        //I want to have () in addEventListener node text, to communicate the type of event
-        //For that, "" are needed => which only works inside: someIdentifier["text()"]
-        if(nodeFrom.includes("addEventListener")){
-            //So just remove brackets from the identifier
-            nodeFrom = `${nodeFrom.replaceAll(/\(|\)/g, "")}["\`${nodeFrom}\`"]`;
-        }
+        
+        nodeFrom = sanitizeEventListenerForMermaid(nodeFrom);
+    
         if(nodesTo.length == 0){
             result += `${nodeFrom}\n`;
         }else{
             for(let nodeTo of nodesTo){
+                nodeTo = sanitizeEventListenerForMermaid(nodeTo);
                 result += `${nodeFrom} --> ${nodeTo}\n`;
             }
         }
@@ -175,7 +182,8 @@ if (process.argv[1] === import.meta.filename) {
         "app/src/content_injectglobal.js",
         "app/src/content_start.js",
         "app/src/global.js",
-        "app/src/permission.js"
+        "app/src/options.js",
+        // "app/src/permission.js"
     ]}).then((e) => console.log(e));
 }
 
@@ -355,6 +363,10 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
                 }
                 //not good: callInfo.shortCallName == document.getElementById for "document.getElementById("save-api-key-button").addEventListener("click", apiKeyUpdate)"
                 functions.set(realShortCallName + ":" + _node.loc.start.line, [callback]);
+                if(!functions.has(callInfo.calledFrom)){
+                    functions.set(callInfo.calledFrom, []);
+                }
+                functions.get(callInfo.calledFrom).push(realShortCallName + ":" + _node.loc.start.line);
                 return;
             }
             
@@ -410,7 +422,7 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
     });
 
     functions.forEach((value, key, map) => {
-        
+        //filters all values, if it is something notable for us or JS standard library "noise"
         map.set(key, value.filter(
             fn => map.has(fn) || //filters out all JS standard functions (leaves only user defined functions)
             fn.includes(":")) //allows what we've found notable (anonymous functions) back in

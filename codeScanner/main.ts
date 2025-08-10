@@ -175,14 +175,14 @@ if (process.argv[1] === import.meta.filename) {
         "eslint.config.js",
         "playwright.config.js",
         "tests/**",
-        "app/src/background_audio.js",
-        "app/src/background_description.js",
-        "app/src/background.js",
-        "app/src/content_channelbranding.js",
-        "app/src/content_injectglobal.js",
-        "app/src/content_start.js",
-        "app/src/global.js",
-        "app/src/options.js",
+        // "app/src/background_audio.js",
+        // "app/src/background_description.js",
+        // "app/src/background.js",
+        // "app/src/content_channelbranding.js",
+        // "app/src/content_injectglobal.js",
+        // "app/src/content_start.js",
+        // "app/src/global.js",
+        // "app/src/options.js",
         // "app/src/permission.js"
     ]}).then((e) => console.log(e));
 }
@@ -368,6 +368,42 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
                 }
                 functions.get(callInfo.calledFrom).push(realShortCallName + ":" + _node.loc.start.line);
                 return;
+            }
+
+            //chrome.* webextension API support
+            if(callInfo.callName.startsWith("chrome")){
+                let args = _node.arguments;
+                //According to TypeScript interfaces of all Chrome extension APIs (https://www.npmjs.com/package/chrome-types?activeTab=code, file "_all.d.ts"),
+                //all functions which have the callback? parameter, have it as the last parameter 
+                if(
+                    args[args.length - 1]?.type == "ArrowFunctionExpression" ||
+                    args[args.length - 1]?.type == "FunctionExpression"
+                ){
+                    callback = `anonymous_function:${args[args.length - 1].loc.start.line}`;
+                }else if(
+                    args[args.length - 1]?.type == "Identifier"
+                ){
+                    callback = (args[args.length - 1] as acorn.Identifier).name;
+                }
+
+                //We found a chrome API which does not have a callback:
+                //example: 'chrome.permissions.request({origins: ["*://*.youtube.com/*"],})'
+                if(!callback){
+                    console.log("skipping", callInfo.callName);
+                    return;
+                }
+
+                //the rest of the treatment can be the same as for other function calls
+                //shortCallName is probably going to be OK, as there aren't chrome.something().somethingElse() APIs
+                //it's always namespace.namespace2.call()
+                //(if this wasn't true, it is possible to do this like with realShortCallName in addEventListener treatment block)
+                // => it is better to do it properly,
+                //shortCallName would fail on this: window.YoutubeAntiTranslate.getBrowserOrChrome().permissions.getAll(
+                functions.set(callInfo.shortCallName + ":" + _node.loc.start.line, [callback]);
+                if(!functions.has(callInfo.calledFrom)){
+                    functions.set(callInfo.calledFrom, []);
+                }
+                functions.get(callInfo.calledFrom).push(callInfo.shortCallName + ":" + _node.loc.start.line);
             }
             
             //callInfo.callName for parameters

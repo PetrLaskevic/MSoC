@@ -3,7 +3,6 @@ import * as acorn from "acorn";
 import * as walk from "acorn-walk";
 import * as fs from 'node:fs/promises';
 import { loadGitIgnore, getSubStringAcrossLines } from './utils.js';
-import { exit } from 'node:process';
 
 let acornOptions: acorn.Options = {
     ecmaVersion: 2020,
@@ -55,6 +54,12 @@ function generateMermaidGraphText(filePath: string, oneFileObject: CodeGraph) : 
         if(nodeFrom == "top level"){
             nodeFrom = "A[top level]"; //nodeIdentifier[any string] is supported
         }
+        //I want to have () in addEventListener node text, to communicate the type of event
+        //For that, "" are needed => which only works inside: someIdentifier["text()"]
+        if(nodeFrom.includes("addEventListener")){
+            //So just remove brackets from the identifier
+            nodeFrom = `${nodeFrom.replaceAll(/\(|\)/g, "")}["\`${nodeFrom}\`"]`;
+        }
         if(nodesTo.length == 0){
             result += `${nodeFrom}\n`;
         }else{
@@ -73,10 +78,12 @@ function generateMermaidGraphText(filePath: string, oneFileObject: CodeGraph) : 
         if(nodeFrom == "top level"){
             nodeFrom = "A";
         }
+        //for addEventListener, strip () in node identifiers
+        nodeFrom = nodeFrom.replaceAll(/\(|\)/g, "");
         //"callback" = the name of the global function in View.svelte
         //since we can't detect any functions in global.js properly at all, so functionDeclarationLineMap[filePath] is undefined
         //use optional chaining between computed property (the []) accesses, with its weird ?. syntax
-        result += `click ${nodeFrom} call callback('${nodeFrom}', ${functionDeclarationLineMap[filePath]?.[nodeFrom] || nodeFrom.split(":")[1]})\n`;
+        result += `click ${nodeFrom} call callback("${nodeFrom}", ${functionDeclarationLineMap[filePath]?.[nodeFrom] || nodeFrom.split(":")[1]})\n`;
     }
     return result;
 }
@@ -160,7 +167,15 @@ if (process.argv[1] === import.meta.filename) {
         ".github",
         "eslint.config.js",
         "playwright.config.js",
-        "tests/**", 
+        "tests/**",
+        "app/src/background_audio.js",
+        "app/src/background_description.js",
+        "app/src/background.js",
+        "app/src/content_channelbranding.js",
+        "app/src/content_injectglobal.js",
+        "app/src/content_start.js",
+        "app/src/global.js",
+        "app/src/permission.js"
     ]}).then((e) => console.log(e));
 }
 
@@ -250,6 +265,7 @@ function getFunctionCallName(callExpressionNode: acorn.CallExpression, ancestors
                 //Search the rest of ancestors for the name of the object this is assigned to
                 let assignedTo = "";
                 for(x - 1; x >= 0; x--){
+                    //TODO: Do similar with VariableDeclarator
                     if(ancestors[x].type == "AssignmentExpression"){
                         ((ancestors[x] as acorn.AssignmentExpression).left as acorn.Identifier).name 
                         let leftSide = (ancestors[x] as acorn.AssignmentExpression).left;
@@ -312,6 +328,36 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
     walk.ancestor(p, {
         CallExpression(_node, _state, ancestors) {
             let callInfo = getFunctionCallName(_node, ancestors, jsCodeLines, filePath);
+            let callback: string;
+            //addEventListener support
+                //split "("[0] does not work for document.getElementById("save-api-key-button").addEventListener("click", apiKeyUpdate);
+            // callInfo.shortCallName.includes("addEventListener")
+            if(_node.callee.type == "MemberExpression" &&  _node.callee.property.type == "Identifier" && _node.callee.property.name == "addEventListener"){
+                let realShortCallNameLoc:acorn.SourceLocation = {
+                    start: {line: 0, column: 0},
+                    end:   {line: 0, column: 0}
+                };
+                //The name location until the start of the callacj argument
+                realShortCallNameLoc.start = callInfo.callLocation.start;
+                realShortCallNameLoc.end = _node.arguments[1].loc.start;
+                //'document.getElementById("save-api-key-button").addEventListener("click",' 
+                let realShortCallName = getSubStringAcrossLines(realShortCallNameLoc, jsCodeLines).trim();
+                realShortCallName = realShortCallName.replace(/,$/, ")"); //=> remove the last ,' and replace with )
+                realShortCallName = realShortCallName.replaceAll('"',"'"); //for Mermaid, which can't have " inside of "" and "" or `""` are needed to escape ()
+                let eventType = _node.arguments[0].type == "Literal" && _node.arguments[0].value;
+                if(
+                    _node.arguments[1].type == "ArrowFunctionExpression" ||
+                    _node.arguments[1].type == "FunctionExpression"
+                ){
+                    callback = `anonymous_function:${_node.arguments[1].loc.start.line}`;
+                }else if(_node.arguments[1].type == "Identifier"){
+                    callback = _node.arguments[1].name;
+                }
+                //not good: callInfo.shortCallName == document.getElementById for "document.getElementById("save-api-key-button").addEventListener("click", apiKeyUpdate)"
+                functions.set(realShortCallName + ":" + _node.loc.start.line, [callback]);
+                return;
+            }
+            
             //callInfo.callName for parameters
             if(!functions.has(callInfo.calledFrom)){
                 functions.set(callInfo.calledFrom, []);

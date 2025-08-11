@@ -17,7 +17,7 @@ export const syncDiagram = (): void => {
 export const initHandler = async (): Promise<void> => {
   applyMigrations();
   loadStateFromURL();
-  await initLoading('Loading Gist...', loadDataFromUrl().catch(console.error));
+  // await initLoading('Loading Gist...', loadDataFromUrl().catch(console.error));
   syncDiagram();
   initURLSubscription();
   verifyState();

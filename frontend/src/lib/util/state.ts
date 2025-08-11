@@ -29,7 +29,6 @@ export const defaultState: State = {
     securityLevel:'loose' //doesn not seem to do anything here
   }),
   panZoom: true,
-  rough: false,
   updateDiagram: true
 };
 

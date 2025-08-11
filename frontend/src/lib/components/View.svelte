@@ -9,7 +9,6 @@
   import type { MermaidConfig } from 'mermaid';
   import { mode } from 'mode-watcher';
   import { onMount } from 'svelte';
-  import { Svg2Roughjs } from 'svg2roughjs';
   import { codePreview } from './shared.svelte';
 
   //Since Mermaid has no knowledge of us moving the diagram around (clicking and dragging), it will view such click drag as a click
@@ -46,7 +45,6 @@
   let code = '';
   let config = '';
   let container: HTMLDivElement | undefined = $state();
-  let rough: boolean;
   let view: HTMLDivElement | undefined = $state();
   let error = $state(false);
   let panZoom = true;
@@ -80,7 +78,6 @@
         if (
           code === state.code &&
           config === state.mermaid &&
-          rough === state.rough &&
           panZoom === state.panZoom
         ) {
           return;
@@ -92,7 +89,6 @@
 
         code = state.code;
         config = state.mermaid;
-        rough = state.rough;
         panZoom = state.panZoom ?? true;
 
         if (mayContainFontAwesome(code)) {
@@ -114,30 +110,13 @@
           if (!graphDiv) {
             throw new Error('graph-div not found');
           }
-          if (state.rough) {
-            const svg2roughjs = new Svg2Roughjs('#container');
-            svg2roughjs.svg = graphDiv;
-            await svg2roughjs.sketch();
-            graphDiv.remove();
-            const sketch = document.querySelector<SVGSVGElement>('#container > svg');
-            if (!sketch) {
-              throw new Error('sketch not found');
-            }
-            const height = sketch.getAttribute('height');
-            const width = sketch.getAttribute('width');
-            sketch.setAttribute('id', 'graph-div');
-            sketch.setAttribute('height', '100%');
-            sketch.setAttribute('width', '100%');
-            sketch.setAttribute('viewBox', `0 0 ${width} ${height}`);
-            sketch.style.maxWidth = '100%';
-            graphDiv = sketch;
-          } else {
-            graphDiv.setAttribute('height', '100%');
-            graphDiv.style.maxWidth = '100%';
-            if (bindFunctions) {
-              bindFunctions(graphDiv);
-            }
+  
+          graphDiv.setAttribute('height', '100%');
+          graphDiv.style.maxWidth = '100%';
+          if (bindFunctions) {
+            bindFunctions(graphDiv);
           }
+          
           if (state.panZoom) {
             handlePanZoom(state, graphDiv);
           }
@@ -154,7 +133,7 @@
       error = true;
     }
     const renderTime = Date.now() - startTime;
-    // saveStatistics({ code, diagramType, isRough: state.rough, renderTime });
+    // saveStatistics({ code, diagramType, renderTime });
     recordRenderTime(renderTime, () => {
       $inputStateStore.updateDiagram = true;
     });

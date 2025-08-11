@@ -168,21 +168,6 @@ ${svgString}`);
     // });
   };
 
-  let gistURL = $state('');
-  stateStore.subscribe(({ loader }) => {
-    if (loader?.type === 'gist') {
-      gistURL = loader.config.url;
-    }
-  });
-
-  const loadGist = () => {
-    if (!gistURL) {
-      return alert('Please enter a Gist URL first');
-    }
-    window.location.href = `${window.location.pathname}?gist=${gistURL}`;
-    // logEvent('loadGist');
-  };
-
   let imageSizeMode: 'auto' | 'width' | 'height' = $state('auto');
 
   $effect(() => {
@@ -252,10 +237,6 @@ ${svgString}`);
       <CopyInput value={$urlsStore.mdCode} label="Copy Markdown" testID={TID.copyMarkdown} />
     {/if}
 
-    <div class="flex w-full items-center gap-2">
-      <Input type="url" bind:value={gistURL} placeholder="Enter Gist URL" />
-      <Button onclick={loadGist}>Load Gist</Button>
-    </div>
     {#if isNetlify}
       <div class="flex w-full items-center justify-center">
         <a class="link text-sm text-gray-500 underline" href="https://netlify.com">

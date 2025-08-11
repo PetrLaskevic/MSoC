@@ -1,10 +1,9 @@
 import type { Loader, State } from '$lib/types';
 import { defaultState, updateCodeStore } from '$lib/util/state';
 import { fetchText } from '$lib/util/util';
-import { loadGistData } from './gist';
 
+//Removed gist loader from here for now
 const loaders: Record<string, Loader> = {
-  gist: loadGistData
 };
 
 export const loadDataFromUrl = async (): Promise<void> => {

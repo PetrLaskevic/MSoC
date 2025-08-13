@@ -28,8 +28,13 @@ Internal graph format which is then used for export to Mermaid format:
     (basically, what functions does it depend on to finish its task)
 
 each of the string[] values is a node (key) as well, leaves are represented as `key: []`
+
+It is essentially a weighted graph, where nodes represent function definitions, and edges between them function calls
+In "A --32-> B" The edge's weight is the line location of the call inside function A to function B
 */
-type CodeGraph = Map<string, string[]>;
+type GraphNode = string;
+type CallLine = number;
+type CodeGraph = Map<GraphNode, [CallLine, GraphNode][]>;
 
 let functionDeclarationLineMap : {[FilePath: string]: {[FunctionName: string]: number}}  = {};
 
@@ -69,9 +74,13 @@ function generateMermaidGraphText(filePath: string, oneFileObject: CodeGraph) : 
         if(nodesTo.length == 0){
             result += `${nodeFrom}\n`;
         }else{
-            for(let nodeTo of nodesTo){
+            for(let [callLine, nodeTo] of nodesTo){
                 nodeTo = sanitizeEventListenerForMermaid(nodeTo);
-                result += `${nodeFrom} --> ${nodeTo}\n`;
+                //Adds an id to the edge, which we can then use when listening to click events
+                //I would put ${nodeTo} as node id prefix to guarantee uniqueness (there may be two calls on one line), but it can contain characters which need escaping
+                //So base64 on it
+                //another fix - maybe I will add in in the future is to pass the call line and column, since that is guaranteed to be unique
+                result += `${nodeFrom} ${btoa(nodeTo)}_${callLine}@--> ${nodeTo}\n`;
             }
         }
     }
@@ -367,11 +376,11 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
                     callback = _node.arguments[1].name;
                 }
                 //not good: callInfo.shortCallName == document.getElementById for "document.getElementById("save-api-key-button").addEventListener("click", apiKeyUpdate)"
-                functions.set(realShortCallName + ":" + _node.loc.start.line, [callback]);
+                functions.set(realShortCallName + ":" + _node.loc.start.line, [[_node.arguments[1].loc.start.line, callback]]);
                 if(!functions.has(callInfo.calledFrom)){
                     functions.set(callInfo.calledFrom, []);
                 }
-                functions.get(callInfo.calledFrom).push(realShortCallName + ":" + _node.loc.start.line);
+                functions.get(callInfo.calledFrom).push([callInfo.callLocation.start.line, realShortCallName + ":" + _node.loc.start.line]);
                 return;
             }
 
@@ -404,18 +413,18 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
                 //(if this wasn't true, it is possible to do this like with realShortCallName in addEventListener treatment block)
                 // => it is better to do it properly,
                 //shortCallName would fail on this: window.YoutubeAntiTranslate.getBrowserOrChrome().permissions.getAll(
-                functions.set(callInfo.shortCallName + ":" + _node.loc.start.line, [callback]);
+                functions.set(callInfo.shortCallName + ":" + _node.loc.start.line, [[_node.arguments[1].loc.start.line, callback]]);
                 if(!functions.has(callInfo.calledFrom)){
                     functions.set(callInfo.calledFrom, []);
                 }
-                functions.get(callInfo.calledFrom).push(callInfo.shortCallName + ":" + _node.loc.start.line);
+                functions.get(callInfo.calledFrom).push([callInfo.callLocation.start.line, callInfo.shortCallName + ":" + _node.loc.start.line]);
             }
             
             //callInfo.callName for parameters
             if(!functions.has(callInfo.calledFrom)){
                 functions.set(callInfo.calledFrom, []);
             }
-            functions.get(callInfo.calledFrom).push(callInfo.shortCallName);
+            functions.get(callInfo.calledFrom).push([callInfo.callLocation.start.line, callInfo.shortCallName]);
             // functions.push(callInfo.shortCallName + " from " + callInfo.calledInFunctions);
         },
         //type of function declaration from acorn.d.ts
@@ -449,12 +458,12 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
                 //new MutationObserver(untranslate)
                 if(node.arguments[0].type == "Identifier"){
                     let callback = node.arguments[0].name;
-                    functions.set(`${node.callee.name}:${line}`, [callback]);
+                    functions.set(`${node.callee.name}:${line}`, [[node.arguments[0].loc.start.line, callback]]);
                 }
                 //new MutationObserver(() => {}), it has no name, but must have a unique identifier - i.e. its line location
                 else if(node.arguments[0].type == "ArrowFunctionExpression"){
                     let callbackLine = node.arguments[0].loc.start.line;
-                    functions.set(`${node.callee.name}:${line}`, [`anonymous_function:${callbackLine}`]);
+                    functions.set(`${node.callee.name}:${line}`, [[node.arguments[0].loc.start.line, `anonymous_function:${callbackLine}`]]);
                 }else{
                     throw Error("Cannot process argument of MutationObserver, it is not a function", {cause: node});
                 }
@@ -463,7 +472,7 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
                 if(!functions.has(appearedInContext)){
                     functions.set(appearedInContext, []);
                 }
-                functions.get(appearedInContext).push(`${node.callee.name}:${line}`);
+                functions.get(appearedInContext).push([node.loc.start.line, `${node.callee.name}:${line}`]);
             }
         }
     });
@@ -471,7 +480,7 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
     functions.forEach((value, key, map) => {
         //filters all values, if it is something notable for us or JS standard library "noise"
         map.set(key, value.filter(
-            fn => map.has(fn) || //filters out all JS standard functions (leaves only user defined functions)
+            fn => map.has(fn[1]) || //filters out all JS standard functions (leaves only user defined functions)
             fn.includes(":")) //allows what we've found notable (anonymous functions) back in
         );
     });

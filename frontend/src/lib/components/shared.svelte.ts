@@ -41,8 +41,14 @@ export function fileNameListToTree(fileNames: string[]): FileTreeMap{
     return global;
 }
 
-export let codePreview = $state({
+export let codePreview: {
+    show: boolean, 
+    jumpToLineNumber: number,
+    jumpMode: "top" | "near-top",
+    isNotPanning: boolean
+} = $state({
     show: false,
     jumpToLineNumber: 0,
+    jumpMode: "top",
     isNotPanning: true
 });

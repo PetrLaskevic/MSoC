@@ -103,6 +103,7 @@
     console.log("nice", functionName, line);
     // console.log($state.snapshot(codePreview))
     if(codePreview.isNotPanning){
+      codePreview.jumpMode = "top";
       codePreview.jumpToLineNumber = line;
       codePreview.show = true;
     }else{
@@ -215,7 +216,7 @@
             defaultSize={30}
             class="hidden h-full flex-grow flex-col sm:flex">
             <!-- <History /> -->
-             <ReadOnlyCodeViewer goToLine={codePreview.jumpToLineNumber} jsCode={openedFile.source} />
+             <ReadOnlyCodeViewer goToLine={codePreview.jumpToLineNumber} jumpMode={codePreview.jumpMode} jsCode={openedFile.source} />
           </Resizable.Pane>
         {/if}
       </Resizable.PaneGroup>

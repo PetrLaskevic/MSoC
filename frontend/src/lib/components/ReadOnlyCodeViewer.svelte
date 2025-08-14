@@ -18,7 +18,7 @@
 		}
 	});
 
-    let { jsCode, goToLine } = $props();
+    let { jsCode, goToLine, jumpMode } = $props();
 
     /* reactiveEffectEnabled
     false for first run, when onMount takes care of initialising and then calls loadCode
@@ -37,7 +37,7 @@
 
 	$effect(() => {
 		if(reactiveEffectEnabled){
-			gotoLine(goToLine);
+			gotoLine(goToLine, jumpMode);
 		}
 	});
 
@@ -104,36 +104,43 @@
 		return editor.getVisibleRanges()[0].endLineNumber - editor.getVisibleRanges()[0].startLineNumber + 1;
 	}
 
-    function gotoLine(line: number){
-        //string from Mermaid won't  do, it will complain:
-        line = Number(line);
-        //Sadly, Monaco doesn't have a way to go to a line AT top, only near top,
-      
-        //Simple reveal line is happy if the line is anywhere visible on the screen
-        //https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IStandaloneCodeEditor.html#revealLine.revealLine-1
-        
-		//So I tried using revealLineNearTop which draws the line in ~ 1/3 of the screen (not the first line)
-		// editor.revealLineNearTop(line);
-		// => to make it the top line i tried line + 14, but the magic number changes slightly based on zoom level (visible number of lines)
-		// (14 was 1/3 of the visible lines)
-		// editor.revealLineNearTop(line + 13,1); //1 means immediate scrollType
+    function gotoLine(line: number, mode: "top" | "near-top"){
+		//string from Mermaid won't  do, it will complain:
+		line = Number(line);
+		//For function calls, where a bit of context is wanted 
+		// + where VSCode sticky scroll (telling us the function scope we're in) would overlap with the line
+		if(mode == "near-top"){
+			editor.revealLineNearTop(line);
+		//For function declarations, where we want the first line in the viewport to be the first line of the function
+		}else if(mode == "top"){
+			//Sadly, Monaco doesn't have a way to go to a line AT top, only near top,
 		
-		//revealLines puts the lines **somewhere** (some of them) on the screen
-		// editor.revealLines(line, line + getViewPortLineHeight());
-        
-		//revealRangeAtTop seems to be close, since irrespective of zoom, it is always off by 5 lines
-		//(presumably for readablility purposes, it displays 5 lines before the first line of the region you asked for)
-		//so I added + 5 to make the function name always the first line
-		console.log("startline", line);
-		console.log("endline", line + getViewPortLineHeight());
-		const OFFSET = 5; // + 4 is also nice, since it shows you one line above the function which gives you a bit of context if there is JSDoc above or not, but not confusing
-		editor.revealRangeAtTop({
-			endColumn: 1,
-			endLineNumber: line + getViewPortLineHeight() + OFFSET,
-			startColumn: 1,
-			startLineNumber: line + OFFSET,
-		}, 1);
-    }
+			//Simple reveal line is happy if the line is anywhere visible on the screen
+			//https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IStandaloneCodeEditor.html#revealLine.revealLine-1
+			
+			//So I tried using revealLineNearTop which draws the line in ~ 1/3 of the screen (not the first line)
+			// editor.revealLineNearTop(line);
+			// => to make it the top line i tried line + 14, but the magic number changes slightly based on zoom level (visible number of lines)
+			// (14 was 1/3 of the visible lines)
+			// editor.revealLineNearTop(line + 13,1); //1 means immediate scrollType
+			
+			//revealLines puts the lines **somewhere** (some of them) on the screen
+			// editor.revealLines(line, line + getViewPortLineHeight());
+			
+			//revealRangeAtTop seems to be close, since irrespective of zoom, it is always off by 5 lines
+			//(presumably for readablility purposes, it displays 5 lines before the first line of the region you asked for)
+			//so I added + 5 to make the function name always the first line
+			console.log("startline", line);
+			console.log("endline", line + getViewPortLineHeight());
+			const OFFSET = 5; // + 4 is also nice, since it shows you one line above the function which gives you a bit of context if there is JSDoc above or not, but not confusing
+			editor.revealRangeAtTop({
+				endColumn: 1,
+				endLineNumber: line + getViewPortLineHeight() + OFFSET,
+				startColumn: 1,
+				startLineNumber: line + OFFSET,
+			}, 1);
+		}
+	}
 </script>
 
 <div class="flex h-screen w-full flex-col">

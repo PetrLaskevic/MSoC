@@ -153,6 +153,7 @@
         if(codePreview.isNotPanning){
           let line = event!.target!.id.split("_")[1];
           console.log(line);
+          codePreview.jumpMode = "near-top";
           codePreview.jumpToLineNumber = line;
           codePreview.show = true;
         }

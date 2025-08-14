@@ -148,11 +148,11 @@
     });
 
     view?.addEventListener("click", (event) => {
-      console.log("yeah", event, event.target, (event.target as SVGAElement)!.className.baseVal);
+      // console.log("yeah", event, event.target, (event.target as SVGAElement)!.className.baseVal);
       if((event.target as SVGAElement)!.className.baseVal == "clickable-edge-hack"){
         if(codePreview.isNotPanning){
           let line = event!.target!.id.split("_")[1];
-          console.log(line);
+          console.log("Going to jump to", line);
           codePreview.jumpMode = "near-top";
           codePreview.jumpToLineNumber = line;
           codePreview.show = true;

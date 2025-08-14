@@ -15,14 +15,9 @@
   //which causes selection of the clicked node in the editor, so not ideal
   //So https://stackoverflow.com/a/45098107 from https://stackoverflow.com/questions/18032136/prevent-click-event-after-drag-in-jquery?rq=3
   function flagged () {
-      // this.isScrolled = true;
-      codePreview.isNotPanning = false; //false
+    codePreview.isNotPanning = false;
   }
-  function preventClick (event) {
-    console.log("prevent")
-      event.preventDefault();
-      event.stopImmediatePropagation();
-  }
+
   onMount(() => {
 
     view!.addEventListener('mousedown', () => {
@@ -35,6 +30,11 @@
 
     //The rest of the puzzle for this click-pan (click-drag) detection prevention is in panZoom.ts
     //Careful testing found that this setup works the best, while not being cleanest code
+    // => there is hammer.on('panstart', () => { ... }) in panZoom.ts, but it is slow to react for small movements
+    // => And this is instant
+    // the key part to set `codePreview.isNotPanning = true` after is in 20 ms timeout in document.addEventListener("mouseup") in panZoom.ts
+    // (the 20 ms were empirically chosen to set it after all click event callbacks on a node after click dragging have ran)
+    // => this way (albeit messily), the clicks trigger the code preview opening and click drags do not
   });
 
 

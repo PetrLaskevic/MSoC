@@ -146,7 +146,22 @@
     stateStore.subscribe((state) => {
       pendingStateChange = pendingStateChange.then(() => handleStateChange(state).catch(() => {}));
     });
+
+    view?.addEventListener("click", (event) => {
+      console.log("yeah", event, event.target, (event.target as SVGAElement)!.className.baseVal);
+      if((event.target as SVGAElement)!.className.baseVal == "clickable-edge-hack"){
+        if(codePreview.isNotPanning){
+          let line = event!.target!.id.split("_")[1];
+          console.log(line);
+          codePreview.jumpToLineNumber = line;
+          codePreview.show = true;
+        }
+      }else{
+        console.log("pan on edge detected not switching")
+      }
+    });
   });
+
 
 </script>
 

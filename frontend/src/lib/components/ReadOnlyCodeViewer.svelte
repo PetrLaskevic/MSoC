@@ -104,13 +104,40 @@
 		return editor.getVisibleRanges()[0].endLineNumber - editor.getVisibleRanges()[0].startLineNumber + 1;
 	}
 
+	//The same line highlight as when you press f12 on a function call and it takes you to the function definition which blinks in VSCode
+	//Found from function `_openReference` in `goToCommands.js` in Monaco source code 
+	//(found with a debugger in Firefox DevTools, breakpoint on keydown event on Monaco parent div and pressing f12 to trigger the keydown and the code path of 'editor.action.revealDefinition' command, and then f10 until I got to _openReference)
+	function blinkLine(line: number){
+		console.log("Blinking line", line);
+		//the range of the whole line (for now)
+		let range = new monaco.Range(
+			line,
+			editor.getModel()!.getLineMinColumn(line),
+			line,
+			editor.getModel()!.getLineMaxColumn(line)
+		);
+		//removing description: 'symbol-navigate-action-highlight' from options since it apparently does not exist on monaco.editor.IStandaloneCodeEditor (type of our `editor` variable) while it does on ICodeEditor they use
+		//works without it fine
+		const modelNow = editor.getModel();
+		const decorations = editor.createDecorationsCollection([{ range, options: {className: 'symbolHighlight' } }]);
+		setTimeout(() => {
+				//I assume this is because there the use can switch tabs and editors?
+				if (editor.getModel() === modelNow) {
+					console.log("clearing")
+					decorations.clear();
+				}
+		}, 350);
+	}
+
     function gotoLine(line: number, mode: "top" | "near-top"){
 		//string from Mermaid won't  do, it will complain:
 		line = Number(line);
+		console.log("Going to line", line, model);
 		//For function calls, where a bit of context is wanted 
 		// + where VSCode sticky scroll (telling us the function scope we're in) would overlap with the line
 		if(mode == "near-top"){
 			editor.revealLineNearTop(line);
+			blinkLine(line);
 		//For function declarations, where we want the first line in the viewport to be the first line of the function
 		}else if(mode == "top"){
 			//Sadly, Monaco doesn't have a way to go to a line AT top, only near top,

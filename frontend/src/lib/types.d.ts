@@ -26,6 +26,7 @@ export interface State {
   code: string;
   mermaid: string;
   updateDiagram: boolean;
+  filePath?: string;
   // All new options must be optional, as users would have old states saved
   renderCount?: number;
   panZoom?: boolean;

@@ -14,7 +14,7 @@
   import View from '$/components/View.svelte';
   import type { EditorMode, Tab } from '$/types';
   import { PanZoomState } from '$/util/panZoom';
-  import { stateStore, updateCode, updateCodeStore, urlsStore } from '$/util/state';
+  import { stateStore, updateCode, updateCodeStore, inputStateStore } from '$/util/state';
   import { initHandler } from '$/util/util';
   import { onMount } from 'svelte';
   import CodeIcon from '~icons/custom/code';
@@ -31,19 +31,27 @@
   let { data }: PageProps = $props();
   console.log("codeScanner vystup", data);
   let files = fileNameListToTree(data.fileNames);
-  open(data.fileNames[0]);
+
+  if($stateStore.filePath){
+    open($stateStore.filePath);
+  }else{
+    open(data.fileNames[0]);
+    $inputStateStore.filePath = data.fileNames[0];
+  }
+  
 
 
   // Switches file (diagram source, loads source code, resets scroll on editor)
   $effect(() => {
+    //TODO: FIX: FileSidebar expects a path starting with "/" while data.diagrams from codeScanner are always without it
+    //For now, slicing works, but it's better to be consistent
     let pathOfDiagram = openedFile.path.slice(1);
     if(openedFile.convertToBackslashes){
       pathOfDiagram = pathOfDiagram.replaceAll("/", "\\");
     }
     console.log($state.snapshot(openedFile.path));
     console.log("ten diagram", $state.snapshot(pathOfDiagram), data.diagrams[pathOfDiagram]);
-    //TODO: FIX: FileSidebar expects a path starting with "/" while data.diagrams from codeScanner are always without it
-    //For now, slicing works, but it's better to be consistent
+   
     updateCode(data.diagrams[pathOfDiagram], {resetPanZoom: true});
 
     //interestingly this, and the node.js FS backend of the API was OK with forward slashes on Windows 
@@ -55,6 +63,7 @@
         codePreview.jumpMode = "top";
       })
     });
+    $inputStateStore.filePath = pathOfDiagram;
   });
 
   const panZoomState = new PanZoomState();

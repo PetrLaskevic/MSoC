@@ -160,6 +160,8 @@ export const urlsStore = derived([stateStore], ([{ code, serialized }]) => {
   };
 });
 
+//Loads a base64 / pako encoded state from data parameter, typically the URL
+//Called only in one place, in util.ts: loadState(window.location.hash.slice(1));
 export const loadState = (data: string): void => {
   let state: State;
   console.log(`Loading '${data}'`);

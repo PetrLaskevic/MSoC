@@ -42,12 +42,12 @@ export function fileNameListToTree(fileNames: string[]): FileTreeMap{
 }
 
 export let codePreview: {
-    show: boolean, 
+    showSidebar: boolean, 
     jumpToLineNumber: number,
     jumpMode: "top" | "near-top",
     isNotPanning: boolean
 } = $state({
-    show: false,
+    showSidebar: false,
     jumpToLineNumber: 0,
     jumpMode: "top",
     isNotPanning: true

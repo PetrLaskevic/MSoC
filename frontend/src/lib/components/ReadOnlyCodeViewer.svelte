@@ -166,6 +166,7 @@
 				startColumn: 1,
 				startLineNumber: line + OFFSET,
 			}, 1);
+			blinkLine(line);
 		}
 	}
 </script>

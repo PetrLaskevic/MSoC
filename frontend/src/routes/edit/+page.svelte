@@ -52,6 +52,7 @@
         console.log(text);
         openedFile.source = text;
         codePreview.jumpToLineNumber = 0;
+        codePreview.jumpMode = "top";
       })
     });
   });
@@ -105,7 +106,7 @@
     if(codePreview.isNotPanning){
       codePreview.jumpMode = "top";
       codePreview.jumpToLineNumber = line;
-      codePreview.show = true;
+      codePreview.showSidebar = true;
     }else{
       console.log("pan detected not switching")
     }
@@ -144,7 +145,7 @@
     so things to the left squished to the left and to the right squished to the right
   -->
   <Navbar editorPane={editorPane} mobileToggle={isMobile ? mobileToggle : undefined}>
-    <Toggle bind:pressed={codePreview.show} size="sm">
+    <Toggle bind:pressed={codePreview.showSidebar} size="sm">
       <SourceCodeIcon />
     </Toggle>
     <Share />
@@ -209,7 +210,7 @@
           <div class="absolute bottom-0 left-0 sm:left-5"><SyncRoughToolbar /></div>
         </Resizable.Pane>
         <!-- right sidebar -->
-        {#if codePreview.show}
+        {#if codePreview.showSidebar}
           <Resizable.Handle class="ml-1 hidden opacity-0 sm:block" />
           <Resizable.Pane
             minSize={15}

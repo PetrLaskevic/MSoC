@@ -155,7 +155,7 @@
           console.log("Going to jump to", line);
           codePreview.jumpMode = "near-top";
           codePreview.jumpToLineNumber = line;
-          codePreview.show = true;
+          codePreview.showSidebar = true;
         }
       }else{
         console.log("pan on edge detected not switching")

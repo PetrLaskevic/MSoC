@@ -14,10 +14,10 @@
   import PlaygroundIcon from '~icons/material-symbols/shape-line-outline';
 
   const menuItems = $derived([
-    { label: 'New Diagram', icon: AddIcon, href: $urlsStore.new },
-    { label: 'Home', icon: HomeIcon, href: 'https://mermaid.js.org/' },
-    { label: 'Documentation', icon: BookIcon, href: 'https://mermaid.js.org/intro/' },
-    { label: 'Community', icon: CommunityIcon, href: 'https://discord.gg/sKeNQX4Wtj' }
+    // { label: 'New Diagram', icon: AddIcon, href: $urlsStore.new },
+    // { label: 'Home', icon: HomeIcon, href: 'https://mermaid.js.org/' },
+    // { label: 'Documentation', icon: BookIcon, href: 'https://mermaid.js.org/intro/' },
+    // { label: 'Community', icon: CommunityIcon, href: 'https://discord.gg/sKeNQX4Wtj' }
   ]);
 </script>
 

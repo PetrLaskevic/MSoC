@@ -58,9 +58,9 @@
     fetch("/file?path=" + pathOfDiagram).then((res) => { //"/file/" + btoa(openedFile.path)
       res.json().then(text => { //text()
         console.log(text);
-        openedFile.source = text;
-        codePreview.jumpToLineNumber = 0;
+        codePreview.jumpToLineNumber = 1;
         codePreview.jumpMode = "top";
+        openedFile.source = text;
       })
     });
     $inputStateStore.filePath = pathOfDiagram;

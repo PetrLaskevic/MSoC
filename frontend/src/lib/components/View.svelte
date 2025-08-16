@@ -147,6 +147,7 @@
       pendingStateChange = pendingStateChange.then(() => handleStateChange(state).catch(() => {}));
     });
 
+    //Detection of clicks on graph edges
     view?.addEventListener("click", (event) => {
       // console.log("yeah", event, event.target, (event.target as SVGAElement)!.className.baseVal);
       if((event.target as SVGAElement)!.className.baseVal == "clickable-edge-hack"){
@@ -156,6 +157,7 @@
           codePreview.jumpMode = "near-top";
           codePreview.jumpToLineNumber = line;
           codePreview.showSidebar = true;
+          codePreview.dataChangeTimeStamp = Date.now();
         }
       }else{
         console.log("pan on edge detected not switching")

@@ -46,9 +46,11 @@ export let codePreview: {
     jumpToLineNumber: number,
     jumpMode: "top" | "near-top",
     isNotPanning: boolean
+    dataChangeTimeStamp?: number //To force update (i.e. blinkLine when clicking on the same edge in graph => reactive effect would not run, previous jumpToLineNumber was the same)
 } = $state({
     showSidebar: false,
     jumpToLineNumber: 0,
     jumpMode: "top",
-    isNotPanning: true
+    isNotPanning: true,
+    dataChangeTimeStamp: Date.now()
 });

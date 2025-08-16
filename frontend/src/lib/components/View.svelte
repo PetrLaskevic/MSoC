@@ -158,9 +158,9 @@
           codePreview.jumpToLineNumber = line;
           codePreview.showSidebar = true;
           codePreview.dataChangeTimeStamp = Date.now();
+        }else{
+          console.log("pan on edge detected not switching")
         }
-      }else{
-        console.log("pan on edge detected not switching")
       }
     });
   });

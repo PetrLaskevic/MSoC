@@ -20,33 +20,21 @@
     </p>
     <p>It's only stored in the URL, and your browser's local storage.</p>
     <p>
-      Mermaid Live Editor is a fully open source, client side application, deployed transparently on <a
+      BirdsEye, based on Mermaid Live Editor, is a fully open source application.
+      Right now it is meant to be ran as a local development tool, and has a node.js backend scanning files from the local file system and exposing them in a public HTTP API to be able to show them in the app.
+    </p>
+    <p>
+      It will be deployed transparently on 
+      <!-- <a
         href="https://github.com/mermaid-js/mermaid-live-editor/deployments"
         class="underline"
-        target="_blank">
-        GitHub Pages
-      </a>.
+        target="_blank"> -->
+        GitHub Pages, once the loading of project files in browser will be implemented. Then it will be a fully client side application. (As opposed to the local server and client model.)
+      <!-- </a>. -->
     </p>
+    
     <p>
-      It will also work as a fully offline
-      <a href="https://web.dev/explore/progressive-web-apps" target="_blank">
-        Progressive Web App.
-      </a>
-    </p>
-    <p>
-      The only server we have is a self hosted version of the open source and privacy friendly
-      Plausible Analytics. We only collect anonymous data related to actions performed, like the
-      type of diagram rendered, number of times a feature was used, etc.
-    </p>
-    <p>
-      All the data we collect is anonymized and
-      <a href="https://p.mermaid.live/mermaid.live" class="underline" target="_blank">
-        available publicly.
-      </a>
-    </p>
-
-    <p>
-      Additional services like the external PNG/SVG/Kroki links and "Save to Mermaid Chart" feature
+      Additional services like the external PNG/SVG/Kroki links
       will share your diagram with the respective 3rd party service.
     </p>
   </Dialog.Content>

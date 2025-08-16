@@ -22,14 +22,11 @@
   type Links = ComponentProps<typeof DropdownNavMenu>['links'];
 
   const githubLinks: Links = [
+    { title: 'BirdsEye', href: 'https://github.com/PetrLaskevic/MSoC' },
     { title: 'Mermaid JS', href: 'https://github.com/mermaid-js/mermaid' },
     {
       title: 'Mermaid Live Editor',
       href: 'https://github.com/mermaid-js/mermaid-live-editor'
-    },
-    {
-      title: 'Mermaid CLI',
-      href: 'https://github.com/mermaid-js/mermaid-cli'
     }
   ];
   let closeLeftSidebar = $state(false);

@@ -226,7 +226,7 @@
             defaultSize={30}
             class="hidden h-full flex-grow flex-col sm:flex">
             <!-- <History /> -->
-             <ReadOnlyCodeViewer goToLine={codePreview.jumpToLineNumber} jumpMode={codePreview.jumpMode} jsCode={openedFile.source} />
+             <ReadOnlyCodeViewer dataChangeTimeStamp={codePreview.dataChangeTimeStamp} goToLine={codePreview.jumpToLineNumber} jumpMode={codePreview.jumpMode} jsCode={openedFile.source} />
           </Resizable.Pane>
         {/if}
       </Resizable.PaneGroup>

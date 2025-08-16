@@ -18,7 +18,7 @@
 		}
 	});
 
-    let { jsCode, goToLine, jumpMode } = $props();
+    let { jsCode, goToLine, jumpMode, dataChangeTimeStamp } = $props();
 
     /* reactiveEffectEnabled
     false for first run, when onMount takes care of initialising and then calls loadCode
@@ -36,6 +36,7 @@
     });
 
 	$effect(() => {
+		dataChangeTimeStamp; //To run blinkLine after the same line as last time has been clicked
 		if(reactiveEffectEnabled){
 			gotoLine(goToLine, jumpMode);
 		}

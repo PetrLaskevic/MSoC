@@ -9,6 +9,9 @@
   import LeftPanelClose from '~icons/material-symbols/left-panel-close';
   import LeftPanelOpen from '~icons/material-symbols/left-panel-open';
   import * as Resizable from '$/components/ui/resizable';
+  import { opened, openedFile } from './FileSidebar/index.svelte';
+  import { FontAwesomeIcon as Icon } from "@fortawesome/svelte-fontawesome";
+  import { faFileCode } from "@fortawesome/free-solid-svg-icons";
   interface Props {
     mobileToggle?: Snippet;
     children: Snippet;
@@ -40,8 +43,8 @@
 </script>
 
 
-<nav class="z-50 flex p-4">
-  <div class="flex flex-1 items-center gap-4">
+<nav class="z-50 flex p-4 justify-between">
+  <div class="flex items-center gap-4"> <!-- flex-1 -->
     <MainMenu />
     <div
       id="switcher"
@@ -64,6 +67,10 @@
       
       <!-- from here I removed the mermaidchart "playground toggle" redirect -->
     </div>
+  </div>
+  <div class="flex items-center justify-center gap-2">
+    <Icon size={"lg"} icon={faFileCode}/> <!-- xl-->
+    <h1 title={openedFile.path} class="text-lg">{openedFile.name}</h1> <!-- text-xl-->
   </div>
   <div
     id="menu"

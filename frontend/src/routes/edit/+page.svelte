@@ -27,6 +27,10 @@
   import Directory from '$/components/FileSidebar/Directory.svelte';
 	import { open, openedFile } from '$/components/FileSidebar/index.svelte';
   import ReadOnlyCodeViewer from '$/components/ReadOnlyCodeViewer.svelte';
+  import { Button } from '$/components/ui/button';
+  import { mode, setMode } from 'mode-watcher';
+  import ThemeIcon from '$/components/ThemeIcon.svelte';
+  import { TID } from '$/constants';
 
   let { data }: PageProps = $props();
   console.log("codeScanner vystup", data);
@@ -158,6 +162,15 @@
       <SourceCodeIcon />
     </Toggle>
     <Share />
+    <Button
+      variant="ghost"
+      size="icon"
+      data-testid={TID.themeToggleButton}
+      title="Switch to {$mode === 'dark' ? 'light' : 'dark'} theme"
+      class="[&_svg]:size-5"
+      onclick={() => setMode($mode === 'dark' ? 'light' : 'dark')}>
+      <ThemeIcon />
+    </Button>
     <!-- From here I ripped the "Save" button which was just a redirect to mermaidchart.com -->
   </Navbar>
 

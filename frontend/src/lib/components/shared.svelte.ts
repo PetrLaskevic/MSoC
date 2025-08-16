@@ -12,7 +12,6 @@ export function fileNameListToTree(fileNames: string[]): FileTreeMap{
     //Windows \ in file paths, convert to them when accessing 
     //(to keep original \ in diagram titles, instead of converting to / everywhere)
     if(fileNames[0].includes("\\")){
-        console.log("SKIBIDIIIIIIIII");
         openedFile.convertToBackslashes = true;
     }
     for(let a of fileNames){

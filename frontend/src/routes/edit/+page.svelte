@@ -216,7 +216,6 @@
                     => if I scroll down in a diagram, switch to Config and then switch to Code the scroll state is lost 
               -->
               <Editor {isMobile} />
-              <!-- <p>SKibidi</p> -->
             </Card>
 
             <div class="group flex flex-wrap justify-between gap-4 sm:gap-6">

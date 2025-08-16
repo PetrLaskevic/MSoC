@@ -172,8 +172,9 @@ export class PanZoomState {
   public reset() {
     this.pzoom?.reset();
     // Zoom out a bit to avoid overlap with the toolbar
-    //TODO: tohle je proč to má menší než optimální velikost
-    this.pzoom?.zoom(0.875);
+    //TODO: this is why it has less than optimal size
+    //=> I moved some components away from FloatingToolbar, so I'll put a higher scale
+    this.pzoom?.zoom(1); //instead of 0.875
     this.isDirty = false;
   }
 }

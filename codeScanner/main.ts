@@ -221,7 +221,14 @@ interface FunctionCallInfo{
 
     calledFrom: string
 }
-
+const forLoopLikeMethods = [
+    "forEach", "map", "filter",
+    "every", "some", "find", "findIndex",
+    "findLast", "findLastIndex",
+    "flatMap", "sort", "toSorted",
+    //and probably even these
+    "reduce", "reduceRight",
+];
 function getCurrentFunctionBodyNameAndCallContext(ancestors: acorn.Node[], code: string[], filePath: string): [string, acorn.Node]{
     let parentExpression;
     let calledFrom = "";
@@ -282,7 +289,6 @@ function getCurrentFunctionBodyNameAndCallContext(ancestors: acorn.Node[], code:
             But that is quite cumbersome - it does not provide the same level of interesting detail like eventListener nodes do,
             as it is just a for loop - with the implementation detail that its block's body has its own function scope
             */
-            const forLoopLikeMethods = ["forEach", "map", "filter"];
             if(
                ancestors[x-1]?.type == "CallExpression" && 
                (ancestors[x-1] as acorn.CallExpression).callee.type == "MemberExpression" &&
@@ -542,7 +548,6 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
         Identifier(node, _state, ancestors){
             //relying on the user that the identifier will be a valid function
             //(We do remember a list of all function, but as we do everything in a single pass, we might've not encountered that function yet.
-            const forLoopLikeMethods = ["forEach", "map", "filter"];
             //The last element is this node, -1 is its parent
             const immediateParent = ancestors[(ancestors.length - 1) - 1];
             /*

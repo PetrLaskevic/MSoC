@@ -503,6 +503,71 @@ function listOfFunctions(jsCode: string, filePath: string) : CodeGraph {
                 }
                 functions.get(appearedInContext).push([node.loc.start.line, `${node.callee.name}:${line}`]);
             }
+        },
+        /*
+        Support for `.forEach`, `.map`, `.filter` with named function callbacks like so:
+        `a.forEach(foo)` with foo being `function foo(x) { ... }`
+        EXAMPLE: 
+            a.filter(test).map(t2);
+        Because of this part of code, the code renders like this:
+            someFunc --> test
+                     --> t2
+        So two edges from the function this is in to test and test2
+
+        test and t2 are called from someFunc (these array methods call their callback directly),
+        and are used defined functions, so they are important, but they would not be captured with previous code
+        
+        NOTE: test and t2 nodes of course have outgoing edges to calls made inside their body:
+
+            someFunc ├──> test ├──> func3
+                     │         └──> func4
+                     └──> t2
+
+        On a similar albeit slightly MORE REDUCED note           (implemented at ArrowFunctionExpression && FunctionExpression handling getCurrentFunctionBodyNameAndCallContext)
+            a.filter((x) => {test(x);t3(y)}).map((y) => y**2);
+        For the case with anonymous function callbacks with code to user defined functions the graph is reduced even more:
+            someFunc --> test
+                     --> t3
+        As you see:
+        - It is not someFunc --> anonymous_function:20 --> test
+                                                       --> t3 
+          or anything like that = if the .filter callback function is not important to be named (anonymous function)
+          it is not that important to show as a separate node 
+          (as .forEach, .map, .filter are basically for loops, and for loops do not have their own nodes in this program)
+          (=> basically, the point is that that these anonymous function callbacks have their own function scopes is an implementation detail)
+          (on a high level, they are for loops, and in the "birdseye" diagram of the program should appear as such, the MEANING was likely the same)
+
+        - the map part is discarded in later filters, as these are not user defined functions => irrelevant
+        */
+        Identifier(node, _state, ancestors){
+            //relying on the user that the identifier will be a valid function
+            //(We do remember a list of all function, but as we do everything in a single pass, we might've not encountered that function yet.
+            const forLoopLikeMethods = ["forEach", "map", "filter"];
+            //The last element is this node, -1 is its parent
+            const immediateParent = ancestors[(ancestors.length - 1) - 1];
+            /*
+            Identifier can be almost anything anywhere (function name, built in property name etc.)
+            So applying this filter to not interfere with the special treatment of event listeners, mutationobservers, intersectionobservers
+            Which have their own callbacks and their treatment
+            (Generally speaking to callback parameters is a special case),
+            I don't want them to show them for all user generated functions 
+                (which may or may not call them) => + I can't identify their callsite inside  
+                + they AREN'T as direct semantically as .forEach, .map, .filter, event listener etc. callbacks
+                  (where pretty the only thing which can happen is them being called from there.
+            */
+            if(
+               immediateParent?.type == "CallExpression" && 
+               (immediateParent as acorn.CallExpression).callee.type == "MemberExpression" &&
+               ((immediateParent as acorn.CallExpression).callee as acorn.MemberExpression).property.type == "Identifier" &&
+               forLoopLikeMethods.includes((((immediateParent as acorn.CallExpression).callee as acorn.MemberExpression).property as acorn.Identifier)?.name)
+            ){
+                let callbackName = node.name;
+                let [calledFrom, parentExpression] = getCurrentFunctionBodyNameAndCallContext(ancestors, jsCodeLines, filePath);
+                if(!functions.has(calledFrom)){
+                    functions.set(calledFrom, []);
+                }
+                functions.get(calledFrom).push([node.loc.start.line, callbackName]);
+            }
         }
     });
 

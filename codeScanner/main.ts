@@ -184,15 +184,15 @@ if (process.argv[1] === import.meta.filename) {
         "eslint.config.js",
         "playwright.config.js",
         "tests/**",
-        // "app/src/background_audio.js",
-        // "app/src/background_description.js",
-        // "app/src/background.js",
+        "app/src/background_audio.js",
+        "app/src/background_description.js",
+        "app/src/background.js",
         // "app/src/content_channelbranding.js",
-        // "app/src/content_injectglobal.js",
-        // "app/src/content_start.js",
-        // "app/src/global.js",
-        // "app/src/options.js",
-        // "app/src/permission.js"
+        "app/src/content_injectglobal.js",
+        "app/src/content_start.js",
+        "app/src/global.js",
+        "app/src/options.js",
+        "app/src/permission.js"
     ]}).then((e) => console.log(e));
 }
 
@@ -258,13 +258,42 @@ function getCurrentFunctionBodyNameAndCallContext(ancestors: acorn.Node[], code:
             break;
         }
         //called from arrow function () => {} which might not have a name
-        //or it inded might: let foo = () => {}
-        //TODO: support extracting a name from such assignment
+        //or it might: let foo = () => {}
         else if(
             item.type == "ArrowFunctionExpression" || //() => {}
             item.type == "FunctionExpression" //function(){}
         ){
+            /*
+            For cases where we want to skip this parent and find next one
+            Like the a.forEach(() => { call() }) case => we're interested in the function where forEach is, not the anonymous callback
+
+                =>  when there are functions like .forEach it makes sense to treat them like normal for loops
+                    even if they have a different function scope,
+
+                        =>  it makes sense for the purpose of this project,
+                            giving a "birds eye" = high level overview on the project
+                            
+            We could do:
+
+            foo.forEach:1 --> anonymous_function:1 --> someFunction
+
+            like we do with event listeners. 
+
+            But that is quite cumbersome - it does not provide the same level of interesting detail like eventListener nodes do,
+            as it is just a for loop - with the implementation detail that its block's body has its own function scope
+            */
+            const forLoopLikeMethods = ["forEach", "map", "filter"];
+            if(
+               ancestors[x-1]?.type == "CallExpression" && 
+               (ancestors[x-1] as acorn.CallExpression).callee.type == "MemberExpression" &&
+               ((ancestors[x-1] as acorn.CallExpression).callee as acorn.MemberExpression).property.type == "Identifier" &&
+               forLoopLikeMethods.includes((((ancestors[x-1] as acorn.CallExpression).callee as acorn.MemberExpression).property as acorn.Identifier)?.name)
+            ){
+                console.log("skip this parent", item)
+                continue;
+            }
             //For functions defined as properties of objects: let a = {setLogLevel: function (levelName) {}}
+            //Extracting the property name as the name of that function
             if(ancestors[x-1]?.type == "Property"){
                 calledFrom = ((ancestors[x-1] as acorn.Property)!.key as acorn.Identifier)!.name //setLogLevel
                 foundFunction = true;

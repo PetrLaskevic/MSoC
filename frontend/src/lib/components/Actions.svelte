@@ -44,6 +44,8 @@
       svg = getSvgElement();
     }
 
+    svg.style.backgroundColor = `hsl(${window.getComputedStyle(document.body).getPropertyValue('--background')})`;
+
     const svgString = svg.outerHTML
       .replaceAll('<br>', '<br/>')
       .replaceAll(/<img([^>]*)>/g, (m, g: string) => `<img ${g} />`);
@@ -91,9 +93,10 @@ ${svgString}`);
     if (!context) {
       throw new Error('context not found');
     }
-    // I assume this is the dark mode detection in file exports: afaik it was not always reliable
-    // TODO: maybe use mode-watcher to tell us the theme? The project uses it anyway (https://github.com/svecosystem/mode-watcher?tab=readme-ov-file#mode) 
-    context.fillStyle = `hsl(${window.getComputedStyle(document.body).getPropertyValue('--background')})`;
+   
+    //This ensures the background is dark when downloading PNG or clicking "Copy Image" which exports the SVG rendered to canvas by this function to PNG (the exporter() call caliing clipboardCopy )
+    //See onCopyClipboard
+    context.fillStyle = `hsl(${window.getComputedStyle(document.body).getPropertyValue('--background')})`;  //in dark mode hsl(222.2 84% 4.9%)
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     const image = new Image();
@@ -113,6 +116,7 @@ ${svgString}`);
     event.preventDefault();
   };
 
+  //Here the dark theme is correct too, as we set the background for canvas explicitly
   const downloadImage: Exporter = (context, image) => {
     return () => {
       const { canvas } = context;
@@ -178,7 +182,6 @@ ${svgString}`);
 
   let imageSize = $state(1080);
 
-  const isNetlify = browser && window.location.host.includes('netlify');
 </script>
 
 {#snippet dualActionButton(text: string, download: (event: Event) => unknown, url?: string)}
@@ -235,14 +238,6 @@ ${svgString}`);
     {/if}
     {#if $urlsStore.mdCode}
       <CopyInput value={$urlsStore.mdCode} label="Copy Markdown" testID={TID.copyMarkdown} />
-    {/if}
-
-    {#if isNetlify}
-      <div class="flex w-full items-center justify-center">
-        <a class="link text-sm text-gray-500 underline" href="https://netlify.com">
-          This site is powered by Netlify
-        </a>
-      </div>
     {/if}
   </div>
 </Card>

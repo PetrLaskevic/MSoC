@@ -187,4 +187,25 @@
     background-size: 30px 30px;
     background-image: radial-gradient(circle, #46464646 2px, #0000 2px);
   }
+
+  /*
+  Moved from app.postcss for clearer code structure
+  
+  Needs :global() as a workaround for https://github.com/sveltejs/svelte/issues/5804
+  Basically svelte optimizing out these CSS classes which it thinks are not needed,
+  just because they appear dynamically vanilla JS style, are not in a svelte template.
+  Frankly, preventing this from being optimized out and having global selectors shouldn't be the same thing..
+  */
+  /*The name .clickable was already taken by nodes, so targeting .clickable is a way to style nodes*/
+  :global(.clickable-edge-hack:hover){
+    filter: drop-shadow(0px 0px 2px #0042eb);
+    stroke: #0042eb;
+    opacity: .5;
+  }
+
+  /*The nodes hoverable as well*/
+  :global(.clickable:hover){
+    /*outline: 5px solid #0042eb;*/
+    filter: drop-shadow(0px 0px 5px #0042eb);
+  }
 </style>

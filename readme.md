@@ -1,3 +1,7 @@
+# BirdsEye - Your Code at a Glance
+Visualise the relationships between your functions, giving you a high-level overview over your project:
+![alt text](image.png)
+
 # To clone:
 The project uses git submodules, so `git clone` alone will not work. It needs a `--recurse-submodules` flag.
 

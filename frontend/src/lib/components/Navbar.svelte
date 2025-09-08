@@ -44,13 +44,13 @@
 
 
 <nav class="z-50 flex p-4 justify-between">
-  <div class="flex items-center gap-4"> <!-- flex-1 -->
+  <div class="flex items-center gap-3"> <!-- flex-1 -->
     <MainMenu />
     <div
       id="switcher"
       class="flex items-center justify-center gap-4 font-medium"
       class:flex-row-reverse={isReferral}>
-      <a href="/" class="whitespace-nowrap text-accent">
+      <a href="/" class="whitespace-nowrap text-accent font-semibold">
         BirdsEye
         {#if !isReferral && !mobileToggle}
           - Your Code At A Glance

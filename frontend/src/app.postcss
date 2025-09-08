@@ -18,7 +18,7 @@
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 228 24% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 340 100% 44%;
+    --accent: 217.2 69.3% 44.7%; /*216.7 62.5% 49.2%;*/
     --accent-foreground: 210 40% 98%;
     --destructive: 0 72.22% 50.59%;
     --destructive-foreground: 210 40% 98%;
@@ -28,6 +28,7 @@
     --radius: 0.75rem;
     --fileSidebar-hover: lightgray;
     --fileSidebar-selected-bg: #000000bf;
+    --logo-shadow: #ced2dd;
   }
   .dark {
     --background: 222.2 84% 4.9%;
@@ -42,15 +43,16 @@
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 340 100% 44%;
+    --accent: 225 81% 69%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
-    --fileSidebar-hover: hsl(var(--primary) / 1); /*from .bg-primary, before it was too dark: hsl(var(--muted) / var(--tw-bg-opacity, 1))*/
-    --fileSidebar-selected-bg: hsl(var(--accent) / 0.7); /*brown was second contender*/
+    --fileSidebar-hover: hsla(240, 0.4%, 51.6%, 0.51); /*hsl(var(--primary) / 0.75);*/ /*from .bg-primary, before it was too dark: hsl(var(--muted) / var(--tw-bg-opacity, 1))*/
+    --fileSidebar-selected-bg: #204e8ac4; /*#204e8a;*/ /* with change of accent color to blue to match the logo, this does not have enough contrast: hsl(var(--accent) / 0.7); */
+    --logo-shadow: #7191f0;
   }
 }
 

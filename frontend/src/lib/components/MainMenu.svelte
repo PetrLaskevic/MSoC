@@ -38,7 +38,7 @@
  https://www.shadcn-svelte.com/docs/components/popover-->
 <Popover.Root>
   <Popover.Trigger class="shrink-0">
-    <img class="size-6" src="/favicon.svg" alt="Mermaid Live Editor" />
+    <img class="size-8 mainLogo" src="/seagull.png" alt="Mermaid Live Editor" />
   </Popover.Trigger>
   <Popover.Content align="start" class="flex flex-col overflow-hidden p-0" sideOffset={16}>
     {#each menuItems as item}
@@ -57,3 +57,13 @@
     </div>
   </Popover.Content>
 </Popover.Root>
+
+<style>
+  .mainLogo{
+    background: white;
+    border-radius: 2px;
+    padding: 1px;
+    /* filter: drop-shadow(0 0 4px var(--logo-shadow)); */
+    transform: scale(1.15) translateY(-2px);
+  }
+</style>

@@ -18,12 +18,13 @@
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-2">
         <h2 class="flex items-center gap-2">
-          <img class="size-5" src="/favicon.svg" alt="Mermaid Live Editor" />
-          Mermaid Live Editor
+          <img class="size-5" src="/seagull.png" alt="Logo of BirdsEye Call Visualiser" />
+          BirdsEye Call Visualiser
         </h2>
         <CopyInput value={window.location.href} />
         <Dialog.Description>
-          The content of the diagrams you create never leaves your browser.
+          Your diagram is not stored at any server. 
+          It is only in the text of the link you share.
         </Dialog.Description>
       </div>
     </div>

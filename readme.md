@@ -1,9 +1,11 @@
 # BirdsEye - Your Code at a Glance
-Visualise the relationships between your functions, giving you a high-level overview over your JavaScript project:
+## Visualise the relationships between your functions, giving you a high-level overview over your JavaScript project:
 ![The resulting diagram](birdseye-graph-example.png)
-Not only that! The diagram is interactive, you can zoom it, drag it, click it!
+## Not only that! The diagram is interactive, you can zoom it, drag it, click it!
 ![The diagram surrounded by rich functionality; a file tree view on the left and the code preview on the right](birdseye-app-demo.gif)
+
 Clicking on a node opens the function's definition in the code preview on the right.
+
 Clicking on an edge opens the call to that function.
 
 There's a tree view on the left so you can switch between files quickly.

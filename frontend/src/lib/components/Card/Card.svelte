@@ -46,6 +46,7 @@
   }: Props = $props();
 
   const toggleCardOpen = () => {
+    console.log("toggling card open from", isOpen, "to", !isOpen);
     if (isClosable) {
       isOpen = !isOpen;
     }
@@ -88,7 +89,7 @@
       'flex h-11 flex-none cursor-pointer items-center justify-between whitespace-nowrap bg-muted p-2',
       isTabsShown && 'pb-1'
     ]}
-    onclick={toggleCardOpen}
+    onclickcapture={toggleCardOpen}
     onkeypress={toggleCardOpen}>
 
     {#if icon || title}

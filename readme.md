@@ -14,7 +14,11 @@ The resulting images can be exported to PNG and SVG.
 # To clone:
 The project uses git submodules, so `git clone` alone will not work. It needs a `--recurse-submodules` flag.
 
-# To run the call graph Mermaid text generator:
+# To run the SvelteKit frontend with the graph text generator:
+1. `npm install`
+2. `npm run dev`
+
+# To run the call graph Mermaid text generator ONLY (without frontend):
 1. Go to the `codeScanner` folder
 2. Run: `npm ci`
 3. Run: `npx tsx main.ts`
@@ -27,10 +31,6 @@ The project uses git submodules, so `git clone` alone will not work. It needs a 
 4. Press `F5`, this should run the program, and stop it at any breakpoints you choose
 
 If you don't use VSCode, just run `tsc` in `codeScanner` before debugging it like you do any other Javascript (this is what the VSCode setup does anyway, just with a fancy one button click).
-
-# To run the SvelteKit frontend with the graph text generator:
-1. `npm install`
-2. `npm run dev`
 
 # Folder structure:
 I wanted the two projects to remain independent, since the codeScanner does not need the frontend and in the future it could be used in i.e. GitHub Actions adding mermaid digrams to documentation.
@@ -100,7 +100,7 @@ Else I would have to run through hoops with `npm link` manually.
 The `link` with workspaces happens automatically and it means that to tools like `vite` the import looks just like any other import from npmjs.com published modules in  `node_modules` and it is happy. So `vite` doesn't have the slightest idea that `code-scanner` is instead in reality in an adjacent folder.
 Also if I publish this, I would not have to change the import names anywhere.
 
-# To view the generated Mermaid graph
+# To view the generated Mermaid graph (if you're not using the frontend)
 For each file a graph is generated. Paste the graph to [https://mermaid.live](https://mermaid.live)
 (There is also [mermaimaidchart.com](mermaimaidchart.com), but the `.live` page is better since it does not require login).
 

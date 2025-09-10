@@ -11,8 +11,23 @@ Clicking on an edge opens the call to that function.
 There's a tree view on the left so you can switch between files quickly.
 The resulting images can be exported to PNG and SVG.
 
+## Built with awesome open-source tech!
+Thanks for:
+- [mermaid.js](https://github.com/mermaid-js/mermaid) for rendering of the graphs
+- [Mermaid Live Editor](https://github.com/mermaid-js/mermaid-live-editor) for the graphs' interactivity
+- [VS Code's Monaco Editor](https://github.com/microsoft/monaco-editor) for code preview 
+- [SvelteKit](https://github.com/sveltejs/kit) to glue it all together on the frontend
+- [acorn JS parser](https://github.com/acornjs/acorn) to examine the code's AST, finding the function calls and declarations, to make the textual graph representations for Mermaid to render
+- [glob](https://github.com/isaacs/node-glob) to enable wildcards to match files for BirdsEye configuration of project analysis on the backend
+- The project's Seagull icon from Flaticon, which I hereby attribute: [bird icons](https://www.flaticon.com/free-icons/bird) 
+<!-- originally this in their HTML: <a href="https://www.flaticon.com/free-icons/bird" title="bird icons">Bird icons created by Freepik - Flaticon</a> so this Markdown should suffice -->
+
+And many other packages, most often dependecies of Mermaid Live Editor this project's frontend is a fork of.
+
+This project was started as part of [Matfyz Summer of Code](https://d3s.mff.cuni.cz/msoc/), a program by [Faculty of Mathematics and Physics of the Charles University](https://www.mff.cuni.cz/en) in Prague. I would like to thank my supervisor, [Pavel Parízek](https://d3s.mff.cuni.cz/people/pavelparizek/)!
+
 # To clone:
-The project uses git submodules, so `git clone` alone will not work. It needs a `--recurse-submodules` flag.
+The project uses git submodules (for a demo project to show the graphs for), so `git clone` alone will not work. It needs a `--recurse-submodules` flag.
 
 # To run the whole project (SvelteKit frontend with the Mermaid graph text generator):
 1. `npm install`

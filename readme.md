@@ -14,7 +14,7 @@ The resulting images can be exported to PNG and SVG.
 # To clone:
 The project uses git submodules, so `git clone` alone will not work. It needs a `--recurse-submodules` flag.
 
-# To run the SvelteKit frontend with the graph text generator:
+# To run the whole project (SvelteKit frontend with the Mermaid graph text generator):
 1. `npm install`
 2. `npm run dev`
 
